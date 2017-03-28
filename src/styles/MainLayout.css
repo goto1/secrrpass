@@ -96,7 +96,9 @@ body {
 	padding: 20px 0 0 0;
 }
 
-.PasswordList { }
+.PasswordList { 
+/*	border: 1px solid green;*/
+}
 
 .PasswordItem {
 	display: flex;
@@ -108,12 +110,27 @@ body {
 	margin-left: 2.5px;
 	letter-spacing: 1.65px;
 	margin: 0 0 15px 0;
+	position: relative;
+	transition: transform .5s ease-in-out;
+}
+
+.PasswordItemMoveToLeft {
+	transform: translateX(-50%);
 }
 
 .PasswordItem .PasswordIcon {
 	font-size: 1.65em;
 	padding: 0 25px 0 25px;
 	color: #F1F1F4;
+}
+
+.PasswordItem .RevealPasswordItemOptionsButton {
+	position: absolute;
+	right: 10px;
+	font-size: 1.15em;
+	color: #F1F1F4;
+	padding: 0 0 0 10px;
+	cursor: pointer;
 }
 
 .PasswordDetails {
@@ -141,4 +158,45 @@ body {
 	.PasswordDetails .UserAccount {
 		font-size: .85em;
 	}
+	.PasswordItem .RevealPasswordItemOptionsButton {
+		font-size: .85em;
+		right: 2.5px;
+	}
+}
+
+.PasswordListItem {
+	display: flex;
+	position: relative;
+}
+
+.PasswordOptions {
+	background: #96B81C;
+	position: absolute;
+	right: 0;
+	top: 20px;
+	width: 155px;
+	height: 50px;
+	margin-right: 20px;
+	border-radius: 500px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.5s ease-in-out;
+	transform: translateX(175px);
+}
+
+.PasswordOptionsShow {
+	transform: translateX(0);
+}
+
+.PasswordOptions i {
+	display: block;
+	font-size: 1.25em;
+	color: #CAFE00;
+	cursor: pointer;
+}
+.PasswordOptions span.spacer {
+	margin: 0 10px 0 10px;
+	font-size: 2.5em;
+	color: #779902;
 }

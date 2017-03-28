@@ -1,5 +1,16 @@
-import React from 'react';
+import React, { Component } from 'react';
 import '../styles/MainLayout.css';
+
+const passwordItems = [
+	{ id: 1, name: 'Yahoo', username: 'jsmith@yahoo.com' },
+	{ id: 2, name: 'Google', username: 'johnny@gmail.com' },
+	{ id: 3, name: 'Amazon', username: 'drpepper@gmail.com' },
+	{ id: 4, name: 'Apple', username: 'willywonka@aol.com' },
+	{ id: 5, name: 'AT&T', username: 'jsmith@gmail.com' },
+	{ id: 6, name: 'Bank of America', username: 'jsmith39993' },
+	{ id: 7, name: 'Wells Fargo', username: 'jw4888' },
+	{ id: 8, name: 'Capital One', username: 'jsmithcap2' },
+];
 
 function PasswordIcon(props) {
 	return (
@@ -22,13 +33,85 @@ function PasswordDetails(props) {
 	);
 }
 
-function PasswordItem(props) {
+function RevealPasswordItemOptionsButton(props) {
 	return (
-		<div className="PasswordItem">
+		<div className="RevealPasswordItemOptionsButton"
+			onClick={props.revealPasswordOptions} >
+			<i 
+				className="fa fa-chevron-right" 
+				aria-hidden="true" />
+		</div>
+	);
+}
+
+function PasswordOptions(props) {
+	const styles = props.display ?
+		'PasswordOptions PasswordOptionsShow' : 'PasswordOptions';
+	return (
+		<div className={styles}>
+			<i className="fa fa-clipboard" aria-hidden="true"></i>
+			<span className="spacer">|</span>
+			<i className="fa fa-pencil" aria-hidden="true"></i>
+			<span className="spacer">|</span>
+			<i className="fa fa-trash-o" aria-hidden="true"></i>
+		</div>
+	);
+}
+
+class PasswordListItem extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			showOptions: false,
+		};
+		this.revealPasswordOptions = this.revealPasswordOptions.bind(this);
+	}
+
+	revealPasswordOptions(event) {
+		this.setState({
+			showOptions: !this.state.showOptions
+		});
+	}
+
+	render() {
+		return (
+			<div className="PasswordListItem">
+				<PasswordItem
+					name={this.props.name}
+					userAccount={this.props.username}
+					moveToLeft={this.state.showOptions} 
+					revealPasswordOptions={this.revealPasswordOptions} />
+				<PasswordOptions display={this.state.showOptions} />
+			</div>
+		);
+	}
+}
+
+function PasswordItem(props) {
+	const styles = props.moveToLeft ?
+		'PasswordItem PasswordItemMoveToLeft' : 'PasswordItem';
+	return (
+		<div className={styles}>
 			<PasswordIcon icon="fa fa-lock" />
 			<PasswordDetails
 				name={props.name}
 				userAccount={props.userAccount} />
+			<RevealPasswordItemOptionsButton
+				revealPasswordOptions={props.revealPasswordOptions} />
+		</div>
+	);
+}
+
+function PasswordList(props) {
+	const passwords = passwordItems.map((password, index) => 
+		<PasswordListItem
+			key={password.id.toString()}
+			name={password.name}
+			username={password.username} />
+	);
+	return (
+		<div className="PasswordList">
+			{passwords}
 		</div>
 	);
 }
@@ -75,32 +158,7 @@ function MainLayout(props) {
 		<div className="MainLayout">
 			<Header />
 			<div className="MainContent">
-				<div className="PasswordList">
-					<PasswordItem 
-						name="Google"
-						userAccount="jsmith@gmail.com" />
-					<PasswordItem 
-						name="Angie's list"
-						userAccount="jaredsmith.4249@gmail.com" />
-					<PasswordItem 
-						name="Apple ID"
-						userAccount="johnpatrick@gmail.com" />
-					<PasswordItem 
-						name="Amazon Web Services"
-						userAccount="michaellee@gmail.com" />
-					<PasswordItem 
-						name="Amazon Web Services 3"
-						userAccount="justinbeiber@gmail.com" />
-					<PasswordItem 
-						name="Amazon Web Services 1"
-						userAccount="whosyourcapitan@gmail.com" />
-					<PasswordItem 
-						name="Amazon Web Services 2"
-						userAccount="iamthecapitan@gmail.com" />
-					<PasswordItem 
-						name="Amazon Web Services 4"
-						userAccount="okdude@gmail.com" />
-				</div>
+				<PasswordList />
 			</div>
 		</div>
 	);
