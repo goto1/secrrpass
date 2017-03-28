@@ -4,6 +4,13 @@
 html, body {
 	background-color: #EAA83C;
 }
+
+@media (max-width: 414px) {
+	html, body {
+		background: #1C1F41;
+	}
+}
+
 body {
 	font-family: 'Roboto', sans-serif;
 	display: flex;
@@ -83,6 +90,7 @@ body {
 
 .MainContent {
 	overflow-y: scroll;
+	overflow-scrolling: touch;
 	height: 100%;
 	margin: 80px 0 20px 0;
 	padding: 20px 0 0 0;
