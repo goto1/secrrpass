@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css');
+
+html, body {
+	background-color: #EAA83C;
+}
+body {
+	font-family: 'Roboto', sans-serif;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+}
+
+.MainLayout {
+	background: #1C1F41;
+	width: 375px;
+	height: 667px;
+	border-radius: 5px;
+	box-shadow: 0 0 20px 2px black;
+	overflow: hidden;
+}
+
+@media (max-width: 414px) {
+	.MainLayout {
+		height: 100vh;
+		width: 100vw;
+		border-radius: 0;
+		box-shadow: none;
+	}
+}
+
+.Header {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	color: #F1F1F4;
+	height: 75px;
+}
+
+.AppIcon {
+/*	border: 1px solid red;*/
+}
+
+.AppIcon .fa-shield {
+	font-size: 2em;
+	transform: rotate(-0.1turn);
+	color: #EE1959;
+}
+
+.AppTitle {
+	background: #F1F1F4;
+	border-radius: 500px;
+	flex-basis: 55%;
+	color: #1C1F41;
+	padding: 5px 20px 5px 20px;
+	max-height: 48px;
+	overflow: hidden;
+}
+
+.AppTitle .title {
+	font-weight: 500;
+	font-size: 1.10em;
+	display: block;
+	text-transform: uppercase;
+	letter-spacing: 1.15px;
+}
+
+.AppTitle .appInfo {
+	font-size: .75em;
+}
+
+@media (max-width: 320px) {
+	.AppTitle .appInfo {
+		font-size: .65em;
+	}
+}
+
+.MenuButton {
+	font-size: 1.85em
+}
