@@ -33,21 +33,47 @@ function PasswordItem(props) {
 	);
 }
 
+function Header(props) {
+	return (
+		<div className="Header">
+			<AppIcon />
+			<AppTitle />
+			<MenuButton />
+		</div>
+	);
+}
+
+function AppTitle(props) {
+	return (
+		<div className="AppTitle">
+			<span className="title">secrrpass</span>
+			<span className="appInfo">
+				Password management made simple.
+			</span>
+		</div>
+	);
+}
+
+function MenuButton(props) {
+	return (
+		<div className="MenuButton">
+			<i className="fa fa-ellipsis-v" aria-hidden="true" />
+		</div>
+	);
+}
+
+function AppIcon(props) {
+	return (
+		<div className="AppIcon">
+			<i className="fa fa-shield" aria-hidden="true"></i>
+		</div>
+	);
+}
+
 function MainLayout(props) {
 	return (
 		<div className="MainLayout">
-			<div className="Header">
-				<div className="AppIcon">
-					<i className="fa fa-shield" aria-hidden="true"></i>
-				</div>
-				<div className="AppTitle">
-					<span className="title">secrrpass</span>
-					<span className="appInfo">Password management made simple.</span>
-				</div>
-				<div className="MenuButton">
-					<i className="fa fa-ellipsis-v" aria-hidden="true"></i>
-				</div>
-			</div>
+			<Header />
 			<div className="MainContent">
 				<div className="PasswordList">
 					<PasswordItem 

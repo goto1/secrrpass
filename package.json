@@ -16,5 +16,6 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "flow": "flow"
-  }
+  },
+  "homepage": "https://goto1.github.io/secrrpass/build"
 }

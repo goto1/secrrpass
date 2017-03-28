@@ -44,7 +44,7 @@ body {
 
 .AppIcon .fa-shield {
 	font-size: 2em;
-	transform: rotate(-0.1turn);
+	transform: rotate(-0.05turn);
 	color: #EE1959;
 }
 
@@ -124,4 +124,13 @@ body {
 	color: #F1F1F4;
 	font-size: .95em;
 	font-weight: 300;
+}
+
+@media (max-width: 320px) {
+	.PasswordDetails .Name {
+		font-size: 1em;
+	}
+	.PasswordDetails .UserAccount {
+		font-size: .85em;
+	}
 }
