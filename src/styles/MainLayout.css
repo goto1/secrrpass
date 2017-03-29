@@ -39,14 +39,39 @@ body {
 }
 
 .Header {
+	padding: 10px 0 10px 0;
+	height: auto;
+}
+
+.Header .FirstRow {
 	display: flex;
 	justify-content: space-around;
 	align-items: center;
 	color: #F1F1F4;
-	height: 75px;
-	position: absolute;
-	width: 100%;
-	top: 0;
+}
+
+.NavigationMenu {
+	display: flex;
+	justify-content: space-around;
+	width: 99.5%;
+	margin: 15px 0 0 0;
+	transition: all .5s ease-in-out;
+	transform: translateX(-350px);
+}
+
+.NavigationMenuActive {
+	transform: translateX(0);
+}
+
+.MenuItem {
+	background: #F35138;
+	font-size: 1.5em;
+	padding: 5px 0px 2.5px 0px;
+	border-radius: 500px;
+	color: #F1F1F4;
+	width: 65px;
+	text-align: center;
+	box-shadow: 0 0 2.5px 4px #75353C;
 }
 
 .AppIcon .fa-shield {
@@ -85,13 +110,20 @@ body {
 }
 
 .MenuButton {
-	font-size: 1.85em
+	font-size: 1.85em;
+	padding: 0 5px 0 5px;
+	cursor: pointer;
+	transition: transform .5s ease-in-out;
+}
+
+.MenuButtonActive {
+	transform: rotate(-90deg);
 }
 
 .MainContent {
 	overflow-y: scroll;
 	height: 100%;
-	margin: 125px 0 40px 0;
+	padding: 5px 0 0 0;
 	height: 81.5%;
 }
 
@@ -200,28 +232,3 @@ body {
 	color: #779902;
 }
 
-.NavigationMenu {
-	position: absolute;
-	top: 11.5%;
-	display: flex;
-	justify-content: space-around;
-	width: 99.5%;
-	transition: transform .5s ease-in-out;
-	transform: translateX(-350px);
-	transform: translateX(0);
-}
-
-.NavigationMenu .NavigationMenuActive {
-	transform: translateX(0);
-}
-
-.MenuItem {
-	background: #F35138;
-	font-size: 1.5em;
-	padding: 5px 0px 2.5px 0px;
-	border-radius: 500px;
-	color: #F1F1F4;
-	width: 65px;
-	text-align: center;
-	box-shadow: 0 0 2.5px 4px #75353C;
-}

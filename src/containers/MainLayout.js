@@ -116,14 +116,33 @@ function PasswordList(props) {
 	);
 }
 
-function Header(props) {
-	return (
-		<div className="Header">
-			<AppIcon />
-			<AppTitle />
-			<MenuButton />
-		</div>
-	);
+class Header extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = { showNavigation: false };
+		this.toggleNavigation = this.toggleNavigation.bind(this);
+	}
+
+	toggleNavigation(event) {
+		this.setState({ showNavigation: !this.state.showNavigation });
+	}
+
+	render() {
+		return (
+			<div className="Header">
+				<div className="FirstRow">
+					<AppIcon />
+					<AppTitle />
+					<MenuButton
+						active={this.state.showNavigation} 
+						toggleNavigation={this.toggleNavigation}/>
+				</div>
+				<NavigationMenu 
+					active={this.state.showNavigation} />
+			</div>
+		);
+	}
 }
 
 function AppTitle(props) {
@@ -138,8 +157,10 @@ function AppTitle(props) {
 }
 
 function NavigationMenu(props) {
+	const styles = props.active ?
+		'NavigationMenu NavigationMenuActive' : 'NavigationMenu';
 	return (
-		<div className="NavigationMenu">
+		<div className={styles}>
 			<div className="MenuItem">
 				<i className="fa fa-home" aria-hidden="true"></i>
 			</div>
@@ -154,8 +175,10 @@ function NavigationMenu(props) {
 }
 
 function MenuButton(props) {
+	const styles = props.active ?
+		'MenuButton MenuButtonActive' : 'MenuButton';
 	return (
-		<div className="MenuButton">
+		<div className={styles} onClick={props.toggleNavigation}>
 			<i className="fa fa-ellipsis-v" aria-hidden="true" />
 		</div>
 	);
@@ -173,7 +196,6 @@ function MainLayout(props) {
 	return (
 		<div className="MainLayout">
 			<Header />
-			<NavigationMenu />
 			<div className="MainContent">
 				<PasswordList />
 			</div>
