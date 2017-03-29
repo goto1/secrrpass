@@ -137,6 +137,22 @@ function AppTitle(props) {
 	);
 }
 
+function NavigationMenu(props) {
+	return (
+		<div className="NavigationMenu">
+			<div className="MenuItem">
+				<i className="fa fa-home" aria-hidden="true"></i>
+			</div>
+			<div className="MenuItem">
+				<i className="fa fa-plus" aria-hidden="true"></i>
+			</div>
+			<div className="MenuItem">
+				<i className="fa fa-info" aria-hidden="true"></i>
+			</div>
+		</div>
+	);
+}
+
 function MenuButton(props) {
 	return (
 		<div className="MenuButton">
@@ -157,6 +173,7 @@ function MainLayout(props) {
 	return (
 		<div className="MainLayout">
 			<Header />
+			<NavigationMenu />
 			<div className="MainContent">
 				<PasswordList />
 			</div>
