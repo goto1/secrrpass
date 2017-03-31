@@ -14,7 +14,7 @@ const passItemStyle = {
 	transition: 'transform .5s ease-in-out',
 };
 
-const passItemActive = {
+const passItemActiveStyle = {
 	...passItemStyle,
 	transform: 'translateX(-50%)',
 };
@@ -53,8 +53,8 @@ const showPassOptsBtn = {
 	cursor: 'pointer',
 };
 
-function PasswordItem(props) {
-	const styles = props.active ? passItemActive : passItemStyle;
+export default (props) => {
+	const styles = props.active ? passItemActiveStyle : passItemStyle;
 	return (
 		<div style={styles}>
 			<div style={passIconStyle}>
@@ -65,14 +65,12 @@ function PasswordItem(props) {
 					{props.name}
 				</div>
 				<div style={passUserAccStyle}>
-					{props.userAccount}
+					{props.login}
 				</div>
 			</div>
-			<div style={showPassOptsBtn} onClick={props.revealPasswordOptions} >
+			<div style={showPassOptsBtn} onClick={props.showOptions} >
 				<i className="fa fa-chevron-right" aria-hidden="true"></i>
 			</div>
 		</div>
 	);
-}
-
-export default PasswordItem;
+};
