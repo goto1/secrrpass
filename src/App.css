@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css');
+
+html, body {
+	background-color: #EAA83C;
+}
+
+@media (max-width: 414px) {
+	html, body {
+		background: #1C1F41;
+	}
+}
+
+body {
+	font-family: 'Roboto', sans-serif;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+}
