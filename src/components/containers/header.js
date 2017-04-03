@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import NavigationMenu from '../views/nav-menu';
 import MenuButton from '../views/menu-button';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import './header.css';
 
 const headerStyle = {
 	padding: '10px 0 10px 0',
-	height: 'auto',
+	height: '68px',
+	transition: 'height 450ms ease-in-out',
 };
 
 const headerRowStyle = {
@@ -14,11 +17,13 @@ const headerRowStyle = {
 	color: '#F1F1F4',
 };
 
-const appIconStyle = {
-	fontSize: '2em',
-	transform: 'rotate(-0.05turn)',
-	color: '#EE1959'
-};
+const Logo = () => (
+	<div style={{
+		fontSize: '2em',
+		transform: 'rotate(-0.05turn)',
+		color: '#EE1959'
+	}}><i className="fa fa-shield" aria-hidden="true" /></div>
+);
 
 const appTitleStyle = {
 	background: '#F1F1F4',
@@ -30,18 +35,29 @@ const appTitleStyle = {
 	overflow: 'hidden'
 };
 
-const titleStyle = {
-	fontWeight: '500',
-	fontSize: '1.10em',
-	display: 'block',
-	textTransform: 'uppercase',
-	letterSpacing: '1.15px',
-};
-
-const appInfoStyle = {
-	fontSize: '.75em',
-	fontWeight: '300',
-};
+const AppTitle = () => (
+	<div style={{
+		background: '#F1F1F4',
+		borderRadius: '500px',
+		flexBasis: '55%',
+		color: '#1C1F41',
+		padding: '5px 20px 5px 20px',
+		maxHeight: '48px',
+		overflow: 'hidden'
+	}}>
+		<span style={{
+			fontWeight: '500',
+			fontSize: '1.1em',
+			display: 'block',
+			textTransform: 'uppercase',
+			letterSpacing: '1.15px'
+		}}>secrrpass</span>
+		<span style={{
+			fontSize: '.75em',
+			fontWeight: '300'
+		}}>Password management made simple.</span>
+	</div>
+);
 
 class Header extends Component {
 	constructor(props) {
@@ -55,29 +71,31 @@ class Header extends Component {
 	}
 
 	render() {
+		const navigation = 
+			<NavigationMenu key={'1'} active={this.state.showNavigation} />;
+		const hStyles = 
+			this.state.showNavigation ? {...headerStyle, height: '97.5px'} : headerStyle;
 		return (
-			<div style={headerStyle}>
+			<div style={hStyles}>
 				<div style={headerRowStyle}>
-					<div style={appIconStyle}>
-						<i className="fa fa-shield" aria-hidden="true"></i>
-					</div>
-					<div style={appTitleStyle}>
-						<span style={titleStyle}>
-							secrrpass
-						</span>
-						<span style={appInfoStyle}>
-							Password management made simple.
-						</span>
-					</div>
+					<Logo />
+					<AppTitle />
 					<MenuButton
 						active={this.state.showNavigation}
 						toggleNavigation={this.toggleNavigation} />
 				</div>
-				<NavigationMenu
-					active={this.state.showNavigation} />
+				<ReactCSSTransitionGroup
+					transitionName="example"
+					transitionEnterTimeout={500}
+					transitionLeaveTimeout={300}>
+					{ this.state.showNavigation && navigation }
+				</ReactCSSTransitionGroup>
 			</div>
 		);
 	}
 }
 
 export default Header;
+
+
+// { this.state.showNavigation && navigation }

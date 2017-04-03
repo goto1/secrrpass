@@ -5,14 +5,14 @@ const navMenuStyle = {
 	justifyContent: 'space-around',
 	width: '99.5%',
 	margin: '15px 0 0 0',
-	transition: 'all .5s ease-in-out',
-	transform: 'translateX(-350px)'
+	// transition: 'all .5s ease-in-out',
+	// transform: 'translateX(-350px)'
 }
 
-const navMenuActiveStyle = {
-	...navMenuStyle,
-	transform: 'translateX(0)',
-};
+// const navMenuActiveStyle = {
+// 	...navMenuStyle,
+// 	transform: 'translateX(0)',
+// };
 
 const menuItemStyle = {
 	background: '#F35138',
@@ -26,7 +26,8 @@ const menuItemStyle = {
 };
 
 function NavigationMenu(props) {
-	const styles = props.active ? navMenuActiveStyle : navMenuStyle;
+	// const styles = props.active ? navMenuActiveStyle : navMenuStyle;
+	const styles = navMenuStyle;
 	return (
 		<div style={styles}>
 			<div style={menuItemStyle}>
