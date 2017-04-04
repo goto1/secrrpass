@@ -1,20 +1,14 @@
 import React from 'react';
 
-const navMenuStyle = {
+const navStyle = {
 	display: 'flex',
 	justifyContent: 'space-around',
-	width: '99.5%',
-	margin: '15px 0 0 0',
-	// transition: 'all .5s ease-in-out',
-	// transform: 'translateX(-350px)'
-}
+	paddingTop: '12.5px',
+	position: 'absolute',
+	width: '100%',
+};
 
-// const navMenuActiveStyle = {
-// 	...navMenuStyle,
-// 	transform: 'translateX(0)',
-// };
-
-const menuItemStyle = {
+const navItemStyle = {
 	background: '#F35138',
 	fontSize: '1.5em',
 	padding: '5px 0px 2.5px 0px',
@@ -25,22 +19,16 @@ const menuItemStyle = {
 	boxShadow: '0 0 2.5px 4px #75353C',
 };
 
-function NavigationMenu(props) {
-	// const styles = props.active ? navMenuActiveStyle : navMenuStyle;
-	const styles = navMenuStyle;
-	return (
-		<div style={styles}>
-			<div style={menuItemStyle}>
-				<i className="fa fa-home" aria-hidden="true"></i>
-			</div>
-			<div style={menuItemStyle}>
-				<i className="fa fa-plus" aria-hidden="true"></i>
-			</div>
-			<div style={menuItemStyle}>
-				<i className="fa fa-info" aria-hidden="true"></i>
-			</div>
-		</div>
-	);
-}
+const NavItem = ({ type }) => (
+	<div style={navItemStyle}>
+		<i className={`fa fa-${type}`} aria-hidden='true'></i>
+	</div>
+);
 
-export default NavigationMenu;
+export default () => (
+	<div style={navStyle}>
+		<NavItem type='home' />
+		<NavItem type='plus' />
+		<NavItem type='info' />
+	</div>
+);
