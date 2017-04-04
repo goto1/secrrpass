@@ -4,36 +4,14 @@ import MenuButton from '../views/menu-button';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import './header.css';
 
-const headerStyle = {
-	padding: '10px 0 10px 0',
-	height: '68px',
-	transition: 'height 450ms ease-in-out',
-};
-
-const headerRowStyle = {
-	display: 'flex',
-	justifyContent: 'space-around',
-	alignItems: 'center',
-	color: '#F1F1F4',
-};
-
 const Logo = () => (
 	<div style={{
 		fontSize: '2em',
-		transform: 'rotate(-0.05turn)',
-		color: '#EE1959'
+		animation: 'logo-spin 7500ms infinite linear',
+		color: '#EE1959',
+		marginLeft: '5px',
 	}}><i className="fa fa-shield" aria-hidden="true" /></div>
 );
-
-const appTitleStyle = {
-	background: '#F1F1F4',
-	borderRadius: '500px',
-	flexBasis: '55%',
-	color: '#1C1F41',
-	padding: '5px 20px 5px 20px',
-	maxHeight: '48px',
-	overflow: 'hidden'
-};
 
 const AppTitle = () => (
 	<div style={{
@@ -43,7 +21,7 @@ const AppTitle = () => (
 		color: '#1C1F41',
 		padding: '5px 20px 5px 20px',
 		maxHeight: '48px',
-		overflow: 'hidden'
+		overflow: 'hidden',
 	}}>
 		<span style={{
 			fontWeight: '500',
@@ -73,11 +51,11 @@ class Header extends Component {
 	render() {
 		const navigation = 
 			<NavigationMenu key={'1'} active={this.state.showNavigation} />;
-		const hStyles = 
-			this.state.showNavigation ? {...headerStyle, height: '97.5px'} : headerStyle;
+		const style = 
+			this.state.showNavigation ? 'Header expand' : 'Header';
 		return (
-			<div style={hStyles}>
-				<div style={headerRowStyle}>
+			<div className={style}>
+				<div className="row">
 					<Logo />
 					<AppTitle />
 					<MenuButton

@@ -1,3 +1,21 @@
+.Header {
+	padding: 10px 0 10px 0;
+	height: 60px;
+	transition: height 450ms ease-in-out;
+}
+
+.expand {
+	height: 97.5px;
+}
+
+.row {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	color: #F1F1F4;
+	padding: 0 5px;
+}
+
 .example-enter {
 	transform: translateX(-70%);
 	opacity: 0;
@@ -6,7 +24,7 @@
 .example-enter.example-enter-active {
 	opacity: 1;
 	transform: translateX(0);
-	transition: transform 350ms ease-in-out 150ms, opacity 350ms ease-in-out 150ms;
+	transition: transform 250ms ease-in-out 200ms, opacity 250ms ease-in-out 200ms;
 }
 
 .example-leave {
@@ -17,5 +35,5 @@
 .example-leave.example-leave-active {
 	opacity: 0;
 	transform: translateX(70%);
-	transition: transform 300ms ease-in-out, opacity 300ms ease-in-out;
+	transition: transform 250ms ease-in-out, opacity 250ms ease-in-out;
 }
