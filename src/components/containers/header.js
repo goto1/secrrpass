@@ -10,7 +10,9 @@ const Logo = () => (
 		animation: 'logo-spin 7500ms infinite linear',
 		color: '#EE1959',
 		marginLeft: '5px',
-	}}><i className="fa fa-shield" aria-hidden="true" /></div>
+	}}>
+		<i className="fa fa-shield" aria-hidden="true" />
+	</div>
 );
 
 const AppTitle = () => (
@@ -63,9 +65,9 @@ class Header extends Component {
 						toggleNavigation={this.toggleNavigation} />
 				</div>
 				<ReactCSSTransitionGroup
-					transitionName="example"
-					transitionEnterTimeout={500}
-					transitionLeaveTimeout={300}>
+					transitionName="nav-transition"
+					transitionEnterTimeout={400}
+					transitionLeaveTimeout={400}>
 					{ this.state.showNavigation && navigation }
 				</ReactCSSTransitionGroup>
 			</div>
@@ -74,6 +76,3 @@ class Header extends Component {
 }
 
 export default Header;
-
-
-// { this.state.showNavigation && navigation }
