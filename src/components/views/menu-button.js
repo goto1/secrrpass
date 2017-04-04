@@ -1,23 +1,23 @@
 import React from 'react';
 
-const menuBtnStyle = {
+const style = {
 	fontSize: '1.85em',
-	padding: '0 5px 0 5px',
+	padding: '0 7.5px',
 	cursor: 'pointer',
 	transition: 'transform .5s ease-in-out',
 };
 
-const menuBtnActiveStyles = {
-	...menuBtnStyle,
+const styleActive = {
+	...style,
 	transform: 'rotate(-90deg)',
 };
 
-function MenuButton(props) {
-	const styles = props.active ? menuBtnActiveStyles : menuBtnStyle;
+const MenuButton = ({ active, toggleNavigation }) => {
+	const styles = active ? styleActive : style;
 	return (
 		<div 
 			style={styles}
-			onClick={props.toggleNavigation}>
+			onClick={toggleNavigation}>
 			<i className="fa fa-ellipsis-v" aria-hidden="true"></i>
 		</div>
 	);
