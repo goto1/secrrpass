@@ -2,29 +2,27 @@ import React from 'react';
 import Header from '../containers/header';
 import PasswordList from '../views/password-list';
 
-const mainLayoutStyle = {
+const layoutStyle = {
 	background: '#1C1F41',
 	width: '375px',
 	height: '667px',
 	borderRadius: '5px',
-	boxShadow: '0 0 40px 1px black',
+	boxShadow: '0 0 20px 5px #323332',
 	overflow: 'hidden',
-	position: 'relative',
+	display: 'flex',
+	flexDirection: 'column',
 };
 
-const mainContentStyle = {
-	overflowY: 'scroll',
-	padding: '5px 0 0 0',
-	height: '81.5%',
-};
-
-export default (props) => {
-	return (
-		<div style={mainLayoutStyle}>
-			<Header />
-			<div style={mainContentStyle}>
-				<PasswordList />
-			</div>
+const MainLayout = () => (
+	<div style={layoutStyle}>
+		<Header />
+		<div style={{
+			overflowY: 'scroll',
+			paddingTop: '5px',
+		}}>
+			<PasswordList />
 		</div>
-	);
-};
+	</div>
+);
+
+export default MainLayout;
