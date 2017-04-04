@@ -1,7 +1,7 @@
 .Header {
 	padding: 10px 0 10px 0;
 	flex-basis: 60px;
-	transition: all 200ms linear 150ms;
+	transition: all 200ms linear 100ms;
 	position: relative;
 	overflow: hidden;
 }
@@ -26,7 +26,7 @@
 .nav-transition-enter.nav-transition-enter-active {
 	opacity: 1;
 	transform: translateX(0);
-	transition: transform 400ms ease-in-out 150ms, opacity 300ms ease-in-out 150ms;
+	transition: all 800ms ease-in-out;
 }
 
 .nav-transition-leave {
@@ -37,5 +37,5 @@
 .nav-transition-leave.nav-transition-leave-active {
 	opacity: 0;
 	transform: translateX(70%);
-	transition: transform 250ms ease-in-out, opacity 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
 }

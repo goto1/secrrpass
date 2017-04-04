@@ -66,8 +66,8 @@ class Header extends Component {
 				</div>
 				<ReactCSSTransitionGroup
 					transitionName="nav-transition"
-					transitionEnterTimeout={400}
-					transitionLeaveTimeout={400}>
+					transitionEnterTimeout={800}
+					transitionLeaveTimeout={200}>
 					{ this.state.showNavigation && navigation }
 				</ReactCSSTransitionGroup>
 			</div>
