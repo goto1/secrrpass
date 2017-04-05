@@ -1,6 +1,28 @@
 import React from 'react';
 
-const passOptionsStyle = {
+const Spacer = () => (
+	<span style={{
+		margin: '0 10px',
+		fontSize: '2.5em',
+		color: '#779902',
+	}}>|</span>
+);
+
+const Option = ({ icon }) => {
+	const className = `fa fa-${icon}`;
+	return (
+		<div style={{
+			display: 'block',
+			fontSize: '1.25em',
+			color: '#CAFE00',
+			cursor: 'pointer',
+		}}>
+			<i className={className} aria-hidden="true"></i>
+		</div>
+	);
+}
+
+const styles = {
 	background: '#96B81C',
 	position: 'absolute',
 	right: '-10px',
@@ -14,27 +36,14 @@ const passOptionsStyle = {
 	justifyContent: 'center',
 };
 
-const iconStyle = {
-	display: 'block',
-	fontSize: '1.25em',
-	color: '#CAFE00',
-	cursor: 'pointer',
-};
+const PasswordOptions = () => (
+	<div style={styles}>
+		<Option icon="clipboard" />
+		<Spacer />
+		<Option icon="pencil" />
+		<Spacer />
+		<Option icon="trash-o" />
+	</div>
+);
 
-const spacerStyle = {
-	margin: '0 10px 0 10px',
-	fontSize: '2.5em',
-	color: '#779902',
-};
-
-export default (props) => {
-	return (
-		<div style={passOptionsStyle}>
-			<i className="fa fa-clipboard" aria-hidden="true" style={iconStyle} />
-			<span style={spacerStyle}>|</span>
-			<i className="fa fa-pencil" aria-hidden="true" style={iconStyle} />
-			<span style={spacerStyle}>|</span>
-			<i className="fa fa-trash-o" aria-hidden="true" style={iconStyle} />
-		</div>
-	);
-};
+export default PasswordOptions;
