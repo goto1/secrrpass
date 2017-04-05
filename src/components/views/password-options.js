@@ -3,8 +3,8 @@ import React from 'react';
 const passOptionsStyle = {
 	background: '#96B81C',
 	position: 'absolute',
-	right: '0',
-	top: '20px',
+	right: '-10px',
+	top: '25px',
 	width: '155px',
 	height: '50px',
 	marginRight: '20px',
@@ -12,13 +12,6 @@ const passOptionsStyle = {
 	display: 'flex',
 	alignItems: 'center',
 	justifyContent: 'center',
-	transition: 'all 0.5s ease-in-out',
-	transform: 'translateX(180px)',
-};
-
-const passOptionsActiveStyle = {
-	...passOptionsStyle,
-	transform: 'translateX(10px)',
 };
 
 const iconStyle = {
@@ -35,9 +28,8 @@ const spacerStyle = {
 };
 
 export default (props) => {
-	const style = props.show ? passOptionsActiveStyle : passOptionsStyle;
 	return (
-		<div style={style}>
+		<div style={passOptionsStyle}>
 			<i className="fa fa-clipboard" aria-hidden="true" style={iconStyle} />
 			<span style={spacerStyle}>|</span>
 			<i className="fa fa-pencil" aria-hidden="true" style={iconStyle} />

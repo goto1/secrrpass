@@ -87,8 +87,8 @@ const PasswordDetails = (props) => {
 		<div style={styles}>
 			<LockIcon />
 			<PasswordOverview
-				serviceName={props.name}
-				userName={props.login}
+				serviceName={props.serviceName}
+				userName={props.userName}
 				optionsShown={props.active} />
 			<ShowPasswordOptions showOptions={props.showOptions} />
 		</div>

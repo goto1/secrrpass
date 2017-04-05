@@ -28,8 +28,8 @@ class PasswordItem extends Component {
 			<div style={passItemStyle}>
 				<PasswordDetails 
 					style={passItemStyle}
-					name={this.props.name}
-					login={this.props.login}
+					serviceName={this.props.password.name}
+					userName={this.props.password.username}
 					active={this.state.showOptions}
 					showOptions={this.showPassOptions} />
 				<ReactCSSTransitionGroup

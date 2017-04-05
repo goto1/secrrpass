@@ -12,18 +12,15 @@ const dummyPasswords = [
 	{ id: 8, name: 'Capital One', username: 'jsmithcap2' },
 ];
 
-const passListStyle = { };
-
-export default (props) => {
+const PasswordList = () => {
 	const passwords = dummyPasswords.map((password, index) => 
 		<PasswordItem
 			key={password.id.toString()}
-			name={password.name}
-			login={password.username} />
+			password={password} />
 	);
 	return (
-		<div style={passListStyle}>
-			{passwords}
-		</div>
-	);		
+		<div>{passwords}</div>
+	);
 };
+
+export default PasswordList;
