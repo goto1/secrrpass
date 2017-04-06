@@ -1,6 +1,11 @@
 import React from 'react';
+import { 
+	BrowserRouter as Router,
+	Route
+} from 'react-router-dom';
 import Header from '../containers/header';
 import PasswordList from '../views/password-list';
+import AddPassword from '../add-password';
 
 const layoutStyle = {
 	background: '#1C1F41',
@@ -14,15 +19,21 @@ const layoutStyle = {
 };
 
 const MainLayout = () => (
-	<div style={layoutStyle}>
-		<Header />
-		<div style={{
-			overflowY: 'scroll',
-			paddingTop: '5px',
-		}}>
-			<PasswordList />
+	<Router>
+		<div style={layoutStyle}>
+			<Header />
+			<div style={{
+				overflowY: 'scroll',
+				paddingTop: '5px',
+			}}>
+				<Route exact path="/" component={PasswordList} />
+				<Route path="/add" component={AddPassword} />
+				<Route path="/info" render={() => (
+					<h1>Hi</h1>
+				)} />
+			</div>
 		</div>
-	</div>
+	</Router>
 );
 
 export default MainLayout;
