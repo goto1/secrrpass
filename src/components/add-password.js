@@ -1,4 +1,6 @@
+/* eslint-disable */
 import React, { Component } from 'react';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as _ from 'lodash';
 import './add-password.css';
 
@@ -63,8 +65,12 @@ const styles = {
 	background: '#2D3665',
 	width: '85%',
 	margin: '0 auto',
+	marginBottom: '20px',
 	borderRadius: '7.5px',
 	padding: '15px',
+	maxHeight: '400px',
+	transition: 'max-height 300ms ease-in-out',
+	overflow: 'hidden',
 }
 
 class AddPasswordForm extends Component {
@@ -72,21 +78,34 @@ class AddPasswordForm extends Component {
 		super(props);
 
 		this.state = {
-			serviceName: '',
-			username: '',
-			password: '',
+			formFields: {
+				serviceName: '',
+				username: '',
+				password: '',
+			},
+			showPasswordGenerator: false,
 		};
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.showPassGenerator = this.showPassGenerator.bind(this);
+		this.onPasswordGenerated = this.onPasswordGenerated.bind(this);
+	}
+
+	onPasswordGenerated(password) {
+		const { formFields } = this.state;
+		const formFieldsWithGeneratedPassword = {...formFields, password: password};
+		this.setState({
+			formFields: formFieldsWithGeneratedPassword
+		});
 	}
 
 	handleChange(event) {
 		const target = event.target;
-		const value = target.value;
-		const name = target.name;
-
-		this.setState({ [name]: value });
+		const { name, value } = target;
+		const updatedFormFields = {...this.state.formFields, [name]: value};
+		
+		this.setState({ formFields: updatedFormFields });
 	}
 
 	handleSubmit(event) {
@@ -94,9 +113,17 @@ class AddPasswordForm extends Component {
 		console.log('submitted:', this.state);
 	}
 
+	showPassGenerator() {
+		this.setState({ showPassGenerator: !this.state.showPassGenerator });
+	}
+
 	render() {
+		const { formFields } = this.state;
+		const newStyles = this.state.showPassGenerator ? 
+			{...styles, maxHeight: '700px'} : styles;
+		const newPassGenerator = <GenerateNewPassword onGenerated={this.onPasswordGenerated} />
 		return (
-			<div style={styles}>
+			<div style={newStyles}>
 				<h1>Add New Password</h1>
 				<form onSubmit={this.handleSubmit}>
 					<label>
@@ -106,7 +133,7 @@ class AddPasswordForm extends Component {
 							type="text" 
 							placeholder="Gmail" 
 							onChange={this.handleChange}
-							value={this.state.name} />
+							value={formFields.name} />
 					</label>
 					<label>
 						<span>Enter your username or email address</span>
@@ -115,28 +142,32 @@ class AddPasswordForm extends Component {
 							type="text" 
 							placeholder="example@gmail.com" 
 							onChange={this.handleChange}
-							value={this.state.username} />
+							value={formFields.username} />
 					</label>
 					<label>
 						<span>Enter or create your password</span>
 						<input 
 							name="password"
-							type="password" 
-							placeholder="********" 
+							type="text" 
+							placeholder="9Mc6k&}A2lIhTlo" 
 							onChange={this.handleChange}
-							value={this.state.password} />
+							value={formFields.password} />
 					</label>
 					<div>
 						<button 
 							type="button"
-							onClick={this.generateNewPassword}>
+							onClick={this.showPassGenerator}>
 							Generate New Password
 						</button>
 						<input type="submit" value="Create" />
 					</div>
 				</form>
-				<GenerateNewPassword />
-
+				<ReactCSSTransitionGroup
+					transitionName="passGen-transition"
+					transitionEnterTimeout={200}
+					transitionLeaveTimeout={300}>
+					{this.state.showPassGenerator && newPassGenerator}
+				</ReactCSSTransitionGroup>
 			</div>
 		);
 	}
@@ -166,7 +197,7 @@ class GenerateNewPassword extends Component {
 
 		this.setState((prevState, currProps) => {
 			const newState = {...prevState, [name]: value};
-			this.generatePassword(newState);
+			this.props.onGenerated(this.generatePassword(newState));
 			return newState;
 		});
 	}
@@ -183,7 +214,7 @@ class GenerateNewPassword extends Component {
 			password = passwordGenerator.generate(length, digits, symbols);
 		}
 
-		console.log(password);
+		return password;
 	}
 
 	render() {
