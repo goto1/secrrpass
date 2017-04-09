@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PasswordGenerator from '../../utils/password-generator';
 
 // TODO delete when CSS moved to App.css
-import '../add-password.css';
+import './add-password.css';
 
 const PassGeneratorSlider = (props) => {
 	const styles = {

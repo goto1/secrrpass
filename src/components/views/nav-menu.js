@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const navStyle = {
 	display: 'flex',
@@ -17,6 +18,7 @@ const navItemStyle = {
 	width: '65px',
 	textAlign: 'center',
 	boxShadow: '0 0 2.5px 4px #75353C',
+	cursor: 'pointer',
 };
 
 const NavItem = ({ type }) => (
@@ -27,8 +29,14 @@ const NavItem = ({ type }) => (
 
 export default () => (
 	<div style={navStyle}>
-		<NavItem type='home' />
-		<NavItem type='plus' />
-		<NavItem type='info' />
+		<Link to="/">
+			<NavItem type='home' />
+		</Link>
+		<Link to="/add">
+			<NavItem type="plus" />
+		</Link>
+		<Link to="/info">
+			<NavItem type="info" />
+		</Link>
 	</div>
 );

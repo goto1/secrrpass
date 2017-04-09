@@ -5,7 +5,7 @@ import {
 } from 'react-router-dom';
 import Header from '../containers/header';
 import PasswordList from '../views/password-list';
-import AddPassword from '../add-password';
+import AddPassword from '../containers/add-password';
 
 const layoutStyle = {
 	background: '#1C1F41',
