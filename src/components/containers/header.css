@@ -1,13 +1,13 @@
 .Header {
 	padding: 10px 0 10px 0;
-	flex-basis: 60px;
+	flex-basis: 50px;
 	transition: all 200ms linear 100ms;
 	position: relative;
 	overflow: hidden;
 }
 
 .expand {
-	flex-basis: 135px;
+	flex-basis: 115px;
 }
 
 .row {

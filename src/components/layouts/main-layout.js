@@ -25,6 +25,7 @@ const MainLayout = () => (
 			<div style={{
 				overflowY: 'scroll',
 				paddingTop: '5px',
+				height: '100%',
 			}}>
 				<Route exact path="/" component={PasswordList} />
 				<Route path="/add" component={AddPassword} />

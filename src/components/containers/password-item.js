@@ -8,7 +8,7 @@ const passItemStyle = {
 	display: 'flex',
 	position: 'relative',
 	overflow: 'hidden',
-	padding: '10px 0',
+	padding: '0 0 10px 0',
 };
 
 class PasswordItem extends Component {
@@ -23,7 +23,7 @@ class PasswordItem extends Component {
 	}
 
 	render() {
-		const passOptions = <PasswordOptions key={'1'} />
+		const passOptions = <PasswordOptions key={'1'} />;
 		return (
 			<div style={passItemStyle}>
 				<PasswordDetails 
