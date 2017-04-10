@@ -1,0 +1,72 @@
+.Card {
+	background: #2D3665;
+	width: 85%;
+	margin: 0 auto;
+	margin-bottom: 20px;
+	border-radius: 7.5px;
+	padding: 15px;
+	overflow: hidden;
+	transition: all 500ms ease-in-out;
+}
+
+.CardHeading {
+	margin: 0 0 20px 0;
+	text-transform: uppercase;
+	font-size: 25px;
+	padding-bottom: 5px;
+	border-bottom: 3px solid #F11C64;
+	color: #F3F3F5;
+	font-weight: 300;
+	letter-spacing: 1.5px;	
+}
+
+.ListItem {
+	display: flex;
+	justify-content: space-between;
+	color: white;
+	padding: 7.5px 10px 7.5px 5px;
+	font-weight: 300;
+	font-size: 17.5px;
+	letter-spacing: 1.25px;
+	margin-bottom: 15px;
+	border-bottom: 3px solid #1F224A;
+}
+
+.ListItemForm {
+	border-radius: 5px;
+	background: #F1F1F4;
+	padding: 15px 20px;
+	/*padding: 5px;*/
+	margin: 15px 0;
+	text-align: right;
+/*	border: 1px solid red;*/
+}
+
+.TextInputField {
+	display: block;
+	border: none;
+	background: inherit;
+	padding-bottom: 2.5px;
+	border-bottom: 2.5px solid #2D3665;
+	width: 100%;
+	margin: 5px auto 20px auto;
+	font-size: 17.5px;
+	color: #1F224A;
+}
+.TextInputField::placeholder {
+	text-transform: uppercase;
+	letter-spacing: 1.25px;
+	color: #1F224A;
+	opacity: .7;
+	font-size: 15px;
+}
+
+.ListItemForm input[type="submit"] {
+	border: 2px solid #EF5A40;
+	color: #EF5A40;
+	font-weight: 400;
+	text-transform: uppercase;
+	letter-spacing: 1.35px;
+	margin-bottom: 5px;
+
+}
