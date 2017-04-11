@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import Card from './layouts/card';
 import './settings.css';
 
 class TextInputField extends Component {
@@ -59,7 +60,7 @@ class ChangeUsernameForm extends Component {
 
 	handleSubmit(event) {
 		event.preventDefault();
-		const { username, password } = this.state;
+		// const { username, password } = this.state;
 		// TODO: handle username change
 	}
 
@@ -94,7 +95,7 @@ class ChangePasswordForm extends Component {
 
 	handleSubmit(event) {
 		event.preventDefault();
-		const { newPassword } = this.state;
+		// const { newPassword } = this.state;
 		// TODO: handle password change
 	}
 
@@ -133,7 +134,7 @@ class DeleteAccountForm extends Component {
 
 	handleSubmit(event) {
 		event.preventDefault();
-		const { password } = this.state;
+		// const { password } = this.state;
 		// TODO: handle deletion of account
 	}
 
@@ -210,17 +211,12 @@ const DeleteAccountOption = () => {
 	return <SettingsOption desc="Delete Account" form={form} />;
 }
 
-class Settings extends Component {
-	render() {
-		return (
-			<div className="Card">
-				<h2 className="CardHeading">Settings</h2>
-				<ChangeUsernameOption />
-				<ChangePasswordOption />
-				<DeleteAccountOption />
-			</div>
-		);
-	}
-}
+const Settings = () => (
+	<Card heading="Settings">
+		<ChangeUsernameOption />
+		<ChangePasswordOption />
+		<DeleteAccountOption />
+	</Card>
+);
 
 export default Settings;

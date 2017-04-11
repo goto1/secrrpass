@@ -1,24 +1,3 @@
-.Card {
-	background: #2D3665;
-	width: 85%;
-	margin: 0 auto;
-	margin-bottom: 20px;
-	border-radius: 7.5px;
-	padding: 15px;
-	overflow: hidden;
-}
-
-.CardHeading {
-	margin: 0 0 20px 0;
-	text-transform: uppercase;
-	font-size: 25px;
-	padding-bottom: 5px;
-	border-bottom: 3px solid #F11C64;
-	color: #F3F3F5;
-	font-weight: 300;
-	letter-spacing: 1.5px;
-}
-
 .SettingsOption .Description {
 	display: flex;
 	justify-content: space-between;
