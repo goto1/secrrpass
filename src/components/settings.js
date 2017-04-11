@@ -13,17 +13,16 @@ class TextInputField extends Component {
 	}
 
 	handleChange(event) {
-		let valid = false;
-		const touched = true;
 		const value = event.target.value;
-		const { onChange } = this.props;
+		const { onChange, name } = this.props;
 
-		if (touched && value.length > 0) {
-			valid = true;
-		}
+		this.setState({
+			value: value,
+			valid: value.length > 0 ? true : false,
+			touched: true,
+		});
 
-		this.setState({ value, valid, touched });
-		onChange(value); // pass the value to the parent
+		onChange({ name, value });
 	}
 
 	render() {
@@ -43,77 +42,143 @@ class TextInputField extends Component {
 				className="TextInputField" 
 				style={styles}
 				placeholder={placeholder}
-				value={value} 
+				value={value}
 				onChange={this.handleChange} />
 		);
 	}
 }
 
-class Form extends Component {
+class ChangeUsernameForm extends Component {
 	constructor() {
 		super();
 		this.state = { username: '', password: '' };
-		this.onInputFormChange = this.onInputFormChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleInputFieldChange = this.handleInputFieldChange.bind(this);
 	}
 
 	handleSubmit(event) {
 		event.preventDefault();
+		const { username, password } = this.state;
+		// TODO: handle username change
 	}
 
-	onInputFormChange(value) {
-		// console.log(value);
-		// this.setState({ })
-		// TODO: figure out what is changing!
+	handleInputFieldChange({ name, value }) {
+		this.setState({ [name]: value });
 	}
 
 	render() {
 		return (
-			<form className="ListItemForm ListItemFormExpanded" onSubmit={this.handleSubmit}>
-				<TextInputField 
-					placeholder="New username" 
-					onChange={this.onInputFormChange} />
-				<TextInputField 
+			<form className="Form" onSubmit={this.handleSubmit}>
+				<TextInputField
+					name="username" 
+					placeholder="New username"
+					onChange={this.handleInputFieldChange} />
+				<TextInputField
+					name="password"
 					placeholder="Current password"
-					onChange={this.onInputFormChange} />
+					onChange={this.handleInputFieldChange} />
 				<input type="submit" value="Submit" />
 			</form>
 		);
-	} 
+	}
 }
 
-const ListItemForm = ({ show }) => {
-	const classes = show ? 'ListItemForm ListItemFormExpanded' : 'ListItemForm';
-	return (
-		<Form />
-	);
-};
+class ChangePasswordForm extends Component {
+	constructor() {
+		super();
+		this.state = { currPassword: '', newPassword: '', newPasswordRepeated: '' };
+		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleInputFieldChange = this.handleInputFieldChange.bind(this);
+	}
 
+	handleSubmit(event) {
+		event.preventDefault();
+		const { newPassword } = this.state;
+		// TODO: handle password change
+	}
 
-class ListItem extends Component {
+	handleInputFieldChange({ name, value }) {
+		this.setState({ [name]: value });
+	}
+
+	render() {
+		return (
+			<form className="Form" onSubmit={this.handleSubmit}>
+				<TextInputField
+					name="currPassword"
+					placeholder="Current password"
+					onChange={this.handleInputFieldChange} />
+				<TextInputField
+					name="newPassword"
+					placeholder="New password"
+					onChange={this.handleInputFieldChange} />
+				<TextInputField
+					name="newPasswordRepeated"
+					placeholder="Repeat new password"
+					onChange={this.handleInputFieldChange} />
+				<input type="submit" value="Submit" />
+			</form>
+		);
+	}
+}
+
+class DeleteAccountForm extends Component {
+	constructor() {
+		super();
+		this.state = { password: '' };
+		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleInputFieldChange = this.handleInputFieldChange.bind(this);
+	}
+
+	handleSubmit(event) {
+		event.preventDefault();
+		const { password } = this.state;
+		// TODO: handle deletion of account
+	}
+
+	handleInputFieldChange({ name, value }) {
+		this.setState({ [name]: value });
+	}
+
+	render() {
+		return (
+			<form className="Form" onSubmit={this.handleSubmit}>
+				<TextInputField 
+					name="password"
+					placeholder="Current password"
+					onChange={this.handleInputFieldChange} />
+				<input 
+					type="submit" 
+					style={{ border: '3px solid red' }}
+					value="Delete account" />
+			</form>
+		);
+	}
+}
+
+class SettingsOption extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { showForm: false };
-		this.toggleForm = this.toggleForm.bind(this);
+		this.toggleShowForm = this.toggleShowForm.bind(this);
 	}
 
-	toggleForm(event) {
+	toggleShowForm(event) {
 		this.setState({ showForm: !this.state.showForm });
 	}
 
 	render() {
 		const { showForm } = this.state;
-		const { desc } = this.props;
-		const form = <ListItemForm show={showForm} />;		
+		const { desc, form } = this.props;
 		return (
-			<div className="ListItemWithForm">
-				<div className="ListItem">
-					<div className="desc">{desc}</div>
+			<div className="SettingsOption">
+				<div className="Description">
+					<div>{desc}</div>
 					<div>
 						<i 
 							className="fa fa-angle-down" 
 							aria-hidden="true" 
-							onClick={this.toggleForm} />
+							onClick={this.toggleShowForm} />
 					</div>
 				</div>
 				{ showForm && form }
@@ -122,14 +187,29 @@ class ListItem extends Component {
 	}
 }
 
+const ChangeUsernameOption = () => {
+	const form = <ChangeUsernameForm />;
+	return <SettingsOption desc="Change Username" form={form} />;
+};
+
+const ChangePasswordOption = () => {
+	const form = <ChangePasswordForm />;
+	return <SettingsOption desc="Change Password" form={form} />;
+};
+
+const DeleteAccountOption = () => {
+	const form = <DeleteAccountForm />;
+	return <SettingsOption desc="Delete Account" form={form} />;
+}
+
 class Settings extends Component {
 	render() {
 		return (
 			<div className="Card">
 				<h2 className="CardHeading">Settings</h2>
-				<ListItem desc="Change Username" />
-				<ListItem desc="Change Password" />
-				<ListItem desc="Delete Account" />
+				<ChangeUsernameOption />
+				<ChangePasswordOption />
+				<DeleteAccountOption />
 			</div>
 		);
 	}
