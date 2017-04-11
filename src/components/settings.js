@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import './settings.css';
 
 class TextInputField extends Component {
@@ -170,35 +171,41 @@ class SettingsOption extends Component {
 	render() {
 		const { showForm } = this.state;
 		const { desc, form } = this.props;
+		const iconClassNames = showForm ? 'fa fa-angle-down rotate' : 'fa fa-angle-down';
 		return (
 			<div className="SettingsOption">
 				<div className="Description">
 					<div>{desc}</div>
 					<div>
 						<i 
-							className="fa fa-angle-down" 
+							className={iconClassNames} 
 							aria-hidden="true" 
 							onClick={this.toggleShowForm} />
 					</div>
 				</div>
-				{ showForm && form }
+				<ReactCSSTransitionGroup
+					transitionName="form-transition"
+					transitionEnterTimeout={500}
+					transitionLeaveTimeout={450}>
+					{ showForm && form }
+				</ReactCSSTransitionGroup>
 			</div>
 		);
 	}
 }
 
 const ChangeUsernameOption = () => {
-	const form = <ChangeUsernameForm />;
+	const form = <ChangeUsernameForm key='1' />;
 	return <SettingsOption desc="Change Username" form={form} />;
 };
 
 const ChangePasswordOption = () => {
-	const form = <ChangePasswordForm />;
+	const form = <ChangePasswordForm key='1' />;
 	return <SettingsOption desc="Change Password" form={form} />;
 };
 
 const DeleteAccountOption = () => {
-	const form = <DeleteAccountForm />;
+	const form = <DeleteAccountForm key='1' />;
 	return <SettingsOption desc="Delete Account" form={form} />;
 }
 
