@@ -172,9 +172,10 @@ class SettingsOption extends Component {
 		const { showForm } = this.state;
 		const { desc, form } = this.props;
 		const iconClassNames = showForm ? 'fa fa-angle-down rotate' : 'fa fa-angle-down';
+		const descStyles = showForm ? { borderBottomColor: '#EF5A40' } : { borderBottomColor: '#1F224A' };
 		return (
 			<div className="SettingsOption">
-				<div className="Description">
+				<div className="Description" style={descStyles}>
 					<div>{desc}</div>
 					<div>
 						<i 

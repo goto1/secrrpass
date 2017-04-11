@@ -28,7 +28,10 @@
 	font-size: 17.5px;
 	letter-spacing: 1.25px;
 	margin-bottom: 15px;
-	border-bottom: 3px solid #1F224A;
+	border-bottom-style: solid;
+	border-bottom-width: 3px;
+	border-bottom-color: green;
+	transition: all 500ms ease-in-out;
 }
 
 .SettingsOption i {
@@ -95,7 +98,7 @@
 .form-transition-enter.form-transition-enter-active {
 	opacity: 1;
 	max-height: 400px;
-	transition: opacity 500ms ease-in-out 100ms, max-height 600ms ease-in-out;
+	transition: opacity 500ms ease-in-out 50ms, max-height 500ms ease-in-out;
 }
 .form-transition-leave {
 	opacity: 1;
@@ -106,22 +109,4 @@
 	max-height: 0px;
 	transition: opacity 500ms ease-in-out, max-height 500ms ease-in-out;
 }
-/*
-.form-transition-enter {
-	opacity: 0;
-	max-height: 0px;
-}
-.form-transition-enter.form-transition-enter-active {
-	opacity: 1;
-	max-height: 500px;
-	transition: all 1000ms ease-in-out;
-}
-.form-transition-leave {
-	opacity: 1;
-	max-height: 500px;
-}
-.form-transition-leave.form-transition-leave-active {
-	opacity: 0;
-	max-height: 0px;
-	transition: all 300ms ease-in-out;
-}*/
+
