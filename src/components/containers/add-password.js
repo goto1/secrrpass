@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import PasswordGeneratorForm from './password-generator-form';
+import FormUtils from '../../utils/form';
 import Card from '../layouts/card';
 import './add-password.css';
 
@@ -57,7 +58,6 @@ class AddPasswordForm extends Component {
 		this.handleInputChange = this.handleInputChange.bind(this);
 		this.onPassGenerated = this.onPassGenerated.bind(this);
 		this.togglePassGenerator = this.togglePassGenerator.bind(this);
-		this.checkIfFormValid = this.checkIfFormValid.bind(this);
 	}
 
 	togglePassGenerator() {
@@ -67,14 +67,6 @@ class AddPasswordForm extends Component {
 	handleSubmit(event) {
 		event.preventDefault();
 		// TODO: handle the submission...
-	}
-
-	checkIfFormValid() {
-		const { formFields } = this.state;
-		const formFieldTypes = Object.keys(this.state.formFields);
-		const validInputFields = formFieldTypes.filter(name => formFields[name].valid);
-
-		return formFieldTypes.length === validInputFields.length;
 	}
 
 	handleInputChange(event) {
@@ -100,6 +92,7 @@ class AddPasswordForm extends Component {
 	render() {
 		const passGenerator = <PasswordGeneratorForm onGenerated={this.onPassGenerated} />
 		const { formFields } = this.state;
+		const isFormValid = FormUtils.checkIfFormValid(formFields);
 		return (
 			<Card heading="Add New Password">
 				<form onSubmit={this.handleSubmit}>
@@ -133,7 +126,7 @@ class AddPasswordForm extends Component {
 						<input 
 							type="submit" 
 							value="Create" 
-							disabled={!this.checkIfFormValid()} />
+							disabled={!isFormValid} />
 					</div>
 				</form>
 				<ReactCSSTransitionGroup
