@@ -1,37 +1,73 @@
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-import PasswordDetails from '../views/password-details.js';
 import PasswordOptions from '../views/password-options.js';
 import './password-item.css';
 
-const passItemStyle = {
-	display: 'flex',
-	position: 'relative',
-	overflow: 'hidden',
-	padding: '0 0 10px 0',
+const ItemIcon = ({ hide }) => {
+	const classes = hide ? 'ItemIcon ItemIconHidden' : 'ItemIcon';
+	return (
+		<div className={classes}>
+			<i className="fa fa-lock" />
+		</div>
+	);
 };
+
+const ServiceName = ({ name }) => 
+	<div className="ServiceName">{name}</div>;
+
+const UserName = ({ user }) => 
+	<div className="UserName">{user}</div>;
+
+const ShowPassOptionsBtn = ({ toggleOptions }) =>
+	<div className="ShowPassOptionsBtn" onClick={toggleOptions}>
+		<i className="fa fa-chevron-right" aria-hidden="true" />
+	</div>;
+
+const Overview = ({ serviceName, userName, showOptions }) => {
+	const classes = showOptions ? 'Overview OverviewShort' : 'Overview';
+	return (
+		<div className={classes}>
+			<ServiceName name={serviceName} />
+			<UserName user={userName} />
+		</div>
+	);
+};
+
+const PasswordDetails = (props) => {
+	const { active, serviceName, userName, toggleOptions } = props;
+	const classes = active ? 'PasswordDetails PasswordDetailsShrink' : 'PasswordDetails';
+	return (
+		<div className={classes}>
+			<ItemIcon hide={active} />
+			<Overview 
+				serviceName={serviceName}
+				userName={userName}
+				showOptions={active} />
+			<ShowPassOptionsBtn toggleOptions={toggleOptions} />
+		</div>
+	);
+}
 
 class PasswordItem extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { showOptions: false };
-		this.showPassOptions = this.showPassOptions.bind(this);
+		this.toggleOptions = this.toggleOptions.bind(this);
 	}
 
-	showPassOptions(event) {
+	toggleOptions() {
 		this.setState({ showOptions: !this.state.showOptions });
 	}
 
 	render() {
 		const passOptions = <PasswordOptions key={'1'} />;
 		return (
-			<div style={passItemStyle}>
+			<div className="PasswordItem">
 				<PasswordDetails 
-					style={passItemStyle}
 					serviceName={this.props.password.name}
 					userName={this.props.password.username}
 					active={this.state.showOptions}
-					showOptions={this.showPassOptions} />
+					toggleOptions={this.toggleOptions} />
 				<ReactCSSTransitionGroup
 					transitionName="showOptions"
 					transitionEnterTimeout={500}
