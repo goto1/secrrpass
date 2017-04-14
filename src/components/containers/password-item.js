@@ -34,19 +34,19 @@ const Overview = ({ serviceName, userName, showOptions }) => {
 };
 
 const PasswordDetails = (props) => {
-	const { active, serviceName, userName, toggleOptions } = props;
-	const classes = active ? 'PasswordDetails PasswordDetailsShrink' : 'PasswordDetails';
+	const { serviceName, userName, toggleOptions, hideIcon } = props;
+	const classes = hideIcon ? 'PasswordDetails PasswordDetailsShrink' : 'PasswordDetails';
 	return (
 		<div className={classes}>
-			<ItemIcon hide={active} />
-			<Overview 
+			<ItemIcon hide={hideIcon} />
+			<Overview
 				serviceName={serviceName}
 				userName={userName}
-				showOptions={active} />
+				showOptions={hideIcon} />
 			<ShowPassOptionsBtn toggleOptions={toggleOptions} />
 		</div>
 	);
-}
+};
 
 class PasswordItem extends Component {
 	constructor(props) {
@@ -67,7 +67,7 @@ class PasswordItem extends Component {
 				<PasswordDetails 
 					serviceName={this.props.password.name}
 					userName={this.props.password.username}
-					active={this.state.showOptions}
+					hideIcon={this.state.showOptions}
 					toggleOptions={this.toggleOptions} />
 				<ReactCSSTransitionGroup
 					transitionName="showOptions"
