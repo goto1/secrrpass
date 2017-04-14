@@ -16,6 +16,7 @@ const PasswordList = () => {
 	const passwords = dummyPasswords.map((password, index) => 
 		<PasswordItem
 			key={password.id.toString()}
+			id={password.id}
 			password={password} />
 	);
 	return (
