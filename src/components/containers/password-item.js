@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-import PasswordOptions from '../views/password-options.js';
+import PasswordOptions from './password-options.js';
 import './password-item.css';
 
 const ItemIcon = ({ hide }) => {
@@ -60,7 +60,8 @@ class PasswordItem extends Component {
 	}
 
 	render() {
-		const passOptions = <PasswordOptions key={'1'} />;
+		const { id } = this.props;
+		const passOptions = <PasswordOptions key={id.toString()} id={id} />;
 		return (
 			<div className="PasswordItem">
 				<PasswordDetails 
