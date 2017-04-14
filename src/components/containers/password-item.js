@@ -70,7 +70,7 @@ class PasswordItem extends Component {
 					hideIcon={this.state.showOptions}
 					toggleOptions={this.toggleOptions} />
 				<ReactCSSTransitionGroup
-					transitionName="showOptions"
+					transitionName="show-options"
 					transitionEnterTimeout={500}
 					transitionLeaveTimeout={500}>
 					{this.state.showOptions && passOptions}
