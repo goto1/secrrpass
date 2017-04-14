@@ -35,8 +35,8 @@ export default () => (
 		<Link to="/add">
 			<NavItem type="plus" />
 		</Link>
-		<Link to="/info">
-			<NavItem type="info" />
+		<Link to="/settings">
+			<NavItem type="user" />
 		</Link>
 	</div>
 );
