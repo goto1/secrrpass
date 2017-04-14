@@ -6,6 +6,7 @@ import {
 import Header from '../containers/header';
 import PasswordList from '../views/password-list';
 import AddPassword from '../containers/add-password';
+import Settings from '../settings';
 
 const layoutStyle = {
 	background: '#1C1F41',
@@ -29,9 +30,7 @@ const MainLayout = () => (
 			}}>
 				<Route exact path="/" component={PasswordList} />
 				<Route path="/add" component={AddPassword} />
-				<Route path="/info" render={() => (
-					<h1>Hi</h1>
-				)} />
+				<Route path="/settings" component={Settings} />
 			</div>
 		</div>
 	</Router>

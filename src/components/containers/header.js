@@ -5,39 +5,18 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import './header.css';
 
 const Logo = () => (
-	<div style={{
-		fontSize: '2em',
-		animation: 'logo-spin 7500ms infinite linear',
-		color: '#EE1959',
-		marginLeft: '5px',
-	}}>
+	<div className="Logo">
 		<i className="fa fa-shield" aria-hidden="true" />
 	</div>
 );
 
 const AppTitle = () => (
-	<div style={{
-		background: '#F1F1F4',
-		borderRadius: '500px',
-		flexBasis: '55%',
-		color: '#1C1F41',
-		padding: '5px 20px 5px 20px',
-		maxHeight: '48px',
-		overflow: 'hidden',
-	}}>
-		<span style={{
-			fontWeight: '500',
-			fontSize: '1.1em',
-			display: 'block',
-			textTransform: 'uppercase',
-			letterSpacing: '1.15px'
-		}}>secrrpass</span>
-		<span style={{
-			fontSize: '.75em',
-			fontWeight: '300'
-		}}>Password management made simple.</span>
+	<div className="AppTitle">
+		<span>secrrpass</span>
+		<span>Password management made simple.</span>
 	</div>
 );
+
 
 class Header extends Component {
 	constructor(props) {
@@ -66,8 +45,8 @@ class Header extends Component {
 				</div>
 				<ReactCSSTransitionGroup
 					transitionName="nav-transition"
-					transitionEnterTimeout={800}
-					transitionLeaveTimeout={200}>
+					transitionEnterTimeout={500}
+					transitionLeaveTimeout={500}>
 					{ this.state.showNavigation && navigation }
 				</ReactCSSTransitionGroup>
 			</div>
