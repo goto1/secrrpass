@@ -23,7 +23,7 @@ const TextInputField = (props) => {
 
 	if (touched && !valid) {
 		styles.borderBottomColor = '#CC0000';
-	} else if (touched) {
+	} else if (touched > 0) {
 		styles.borderBottomColor = '#35D235';
 	}
 
@@ -84,7 +84,11 @@ class AddPasswordForm extends Component {
 	}
 
 	onPassGenerated(pass) {
-		const password = { value: pass, valid: pass.length > 0 ? true : false};
+		const password = { 
+			value: pass, 
+			valid: pass.length > 0 ? true : false,
+			touched: true 
+		};
 		const formFields = {...this.state.formFields, password};
 		this.setState({ formFields });
 	}
