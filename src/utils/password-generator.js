@@ -1,30 +1,9 @@
 import * as _ from 'lodash';
+import randGenerator from './random-generator';
 
-export default {
-	specialCharacters: [
-		']', '[', '?', '/',
-		'<', '~', '#', '`',
-		'!', '@', '$', '%', 
-		'^', '&', '*', '(',
-		')', '+', '=', '}',
-		'|', ':', '"', ';',
-		'_', '.', '>', '{'
-	],
-	letters: [
-		'a', 'b', 'c', 'd',
-		'e', 'f', 'g', 'h',
-		'i', 'j', 'k', 'l',
-		'm', 'n', 'o', 'p',
-		'r', 's', 't', 'u',
-		'w', 'z'
-	],
-	getRandomCharacter(characterSet) {
-		const min = 0;
-		const max = characterSet.length - 1;
-		const position = Math.floor(Math.random() * (max - min)) + min;
+const { specialChars, letters, getRandomCharFrom, generateRandomNum } = randGenerator;
 
-		return characterSet[position];
-	},
+const passwordGenerator = {
 	generateNewPasswordWith(recipe) {
 		let password = '';
 		const { length, digits, symbols } = recipe;
@@ -41,28 +20,27 @@ export default {
 	},
 	generate(length, numOfNumbers = 0, numOfSpecChars = 0) {
 		let password = '';
-		let tempArray = [];
+		const tempArray = [];
 		const numOfLetters = (length - numOfNumbers) - numOfSpecChars;
 
 		for (let i = 0; i < numOfLetters; i++) {
-			let randomLetter = this.getRandomCharacter(this.letters);
-			randomLetter = (i % 3 === 0) ? randomLetter.toUpperCase() : randomLetter;
-			tempArray.push(randomLetter);
+			let letter = getRandomCharFrom(letters);
+			letter = (i % 3 === 0) ? letter.toUpperCase() : letter;
+			tempArray.push(letter);
 		}
 
 		for (let i = 0; i < numOfNumbers; i++) {
-			const randomNumber = Math.floor(Math.random() * 10);
-			tempArray.push(randomNumber.toString());
+			tempArray.push(generateRandomNum());
 		}
 
 		for (let i = 0; i < numOfSpecChars; i++) {
-			tempArray.push(this.getRandomCharacter(this.specialCharacters));
+			tempArray.push(getRandomCharFrom(specialChars));
 		}
 
-		tempArray = tempArray.slice(0, length);
-		tempArray = _.shuffle(tempArray);
-		password = tempArray.join(' ').replace(/\s+/g, '');
+		password = _.shuffle(tempArray).join(' ').replace(/\s+/g, '');
 
 		return password;
-	},
+	}
 };
+
+export default passwordGenerator;
