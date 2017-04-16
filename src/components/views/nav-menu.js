@@ -27,16 +27,22 @@ const NavItem = ({ type }) => (
 	</div>
 );
 
-export default () => (
-	<div style={navStyle}>
-		<Link to="/">
-			<NavItem type='home' />
-		</Link>
-		<Link to="/add">
-			<NavItem type="plus" />
-		</Link>
-		<Link to="/settings">
-			<NavItem type="user" />
-		</Link>
-	</div>
-);
+const NavigationMenu = () => {
+	const userID = localStorage.getItem('userID') || '';
+
+	return (
+		<div style={navStyle}>
+			<Link to={userID ? `/${userID}` : '/'}>
+				<NavItem type='home' />
+			</Link>
+			<Link to={userID ? `/${userID}/add` : '/add'}>
+				<NavItem type='plus' />
+			</Link>
+			<Link to={userID ? `/${userID}/settings` : '/settings'}>
+				<NavItem type='user' />
+			</Link>
+		</div>
+	);
+}
+
+export default NavigationMenu;

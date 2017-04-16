@@ -1,10 +1,7 @@
 import React from 'react';
-import { 
-	BrowserRouter as Router,
-	Route
-} from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import Header from '../containers/header';
-import PasswordList from '../views/password-list';
+import PasswordList from '../containers/password-list';
 import AddPassword from '../containers/add-password';
 import Settings from '../settings';
 
@@ -20,20 +17,18 @@ const layoutStyle = {
 };
 
 const MainLayout = () => (
-	<Router>
-		<div style={layoutStyle}>
-			<Header />
-			<div style={{
-				overflowY: 'scroll',
-				paddingTop: '5px',
-				height: '100%',
-			}}>
-				<Route exact path="/" component={PasswordList} />
-				<Route path="/add" component={AddPassword} />
-				<Route path="/settings" component={Settings} />
-			</div>
+	<div style={layoutStyle}>
+		<Header />
+		<div style={{
+			overflowY: 'scroll',
+			paddingTop: '5px',
+			height: '100%',
+		}}>
+			<Route exact path="/:userID?" component={PasswordList} />
+			<Route path="/:userID?/add" component={AddPassword} />
+			<Route path="/:userID?/settings" component={Settings} />
 		</div>
-	</Router>
+	</div>
 );
 
 export default MainLayout;
