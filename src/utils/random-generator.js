@@ -25,11 +25,12 @@ const getRandomCharFrom = (charSet) => {
 	return charSet[pos];
 };
 
-const genRandomNum = () => Math.floor(Math.random() * 10);
+const generateRandomNum = () => Math.floor(Math.random() * 10);
+
 
 export default {
 	specialChars,
 	letters,
 	getRandomCharFrom,
-	genRandomNum,
+	generateRandomNum,
 };
