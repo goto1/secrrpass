@@ -100,9 +100,9 @@ const editPassword = (userID, passwordID, updatedPassword) => {
 	}
 	updateUserLastAccess(userID);
 
-	const updates = {};
-	updates[`/users/${userID}/passwords/${passwordID}`] = updatedPasswordDetails;
-
+	const updates = {
+		[`/users/${userID}/passwords/${passwordID}`]: updatedPassword,
+	};
 
 	firebase.database().ref().update(updates);
 };
