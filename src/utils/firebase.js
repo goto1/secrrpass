@@ -6,30 +6,22 @@ import config from '../config/firebase';
 firebase.initializeApp(config);
 
 const checkIfValidUserID = (userID) => {
-	let valid = false;
+	const isValid = 
+		(typeof userID === 'string' && userID.length === 6) ? true : false;
 
-	if (userID && typeof userID === 'string' && userID.length === 6) {
-		valid = true;
-	}
-
-	return valid;
+	return isValid;
 }
 
 const checkIfValidPasswordID = (passwordID) => {
-	let valid = false;
+	const isValid =
+		(typeof passwordID === 'string' && passwordID.length === 20) ? true : false;
 
-	if (passwordID && typeof passwordID === 'string' && passwordID.length === 20) {
-		valid = true;
-	}
-
-	return valid;
+	return isValid;
 };
 
 const updateUserLastAccess = (userID) => {
-	if (!checkIfValidUserID(userID)) {
-		return new Promise((resolve, reject) => {
-			reject('Invalid UserID');
-		});
+	if (!checkIfValidUserID) {
+		return new Promise.reject('Invalid UserID');
 	}
 
 	const updates = {
@@ -40,20 +32,25 @@ const updateUserLastAccess = (userID) => {
 };
 
 const checkIfUserExists = (userID) => {
-	if (!checkIfValidUserID(userID)) { 
-		return new Promise((resolve, reject) => {
-			reject('Invalid UserID');
-		});
+	if (!checkIfValidUserID) {
+		return new Promise.reject('Invalid UserID');
 	}
 
 	return firebase.database().ref(`/users/${userID}`).once('value');
-}
+};
 
-const	createNewUser = (userID) => {
+const getUserReference =
+	(userID) => firebase.database().ref(`/users/${userID}`);
+
+const getPassReference =
+	(userID, passwordID) => firebase.database().ref(`/users/${userID}/passwords/${passwordID}`);
+
+const createNewUser = (userID) => {
 	if (!checkIfValidUserID(userID)) { return; }
 
-	firebase.database().ref(`/users/${userID}`).set({
-		passwords: {},
+	const userRef = getUserReference(userID);
+
+	userRef.set({
 		firstAccess: Date.now(),
 		lastAccess: Date.now(),
 	});
@@ -62,53 +59,50 @@ const	createNewUser = (userID) => {
 const deleteUser = (userID) => {
 	if (!checkIfValidUserID(userID)) { return; }
 
-	firebase.database().ref(`/users/${userID}`).remove();
+	const userRef = getUserReference(userID);
+
+	userRef.remove();
 };
 
-const createNewPassword = (userID, passwordDetails) => {
-	if (!checkIfValidUserID(userID) || !passwordDetails) { 
-		return; 
-	}
-
-	const password = {
-		serviceName: passwordDetails.serviceName,
-		userName: passwordDetails.userName,
-		password: passwordDetails.password,
-		createdAt: Date.now(),
-		updatedAt: Date.now(),
-	};
-
-	const passwordID = firebase.database().ref().child('passwords').push().key;
-	const updates = {};
-	updates[`/users/${userID}/passwords/${passwordID}`] = password;
-
+const createNewPassword = (userID, password) => {
+	if (!checkIfValidUserID(userID) || !password) { return; }
 	updateUserLastAccess(userID);
 
-	firebase.database().ref().update(updates);
+	const passwordID = firebase.database().ref().child('passwords').push().key;
+	const passRef = getPassReference(userID, passwordID);
+
+	passRef.set({
+		serviceName: password.serviceName || '',
+		userName: password.userName || '',
+		password: password.password || '',
+		createdAt: Date.now(),
+		updatedAt: Date.now(),
+	});
 };
 
 const getAllPasswords = (userID) => {
 	if (!checkIfValidUserID) {
-		return new Promise((resolve, reject) => {
-			reject('Invalid UserID');
-		});
+		return new Promise.reject('Invalid UserID');
 	}
 	updateUserLastAccess(userID);
 
-	return firebase.database().ref(`/users/${userID}/passwords`).once('value');
+	const passwordsRef = 
+		firebase.database().ref(`/users/${userID}/passwords`);
+
+	return passwordsRef.once('value');
 }
 
-const editPassword = (userID, passwordID, updatedPasswordDetails) => {
+const editPassword = (userID, passwordID, updatedPassword) => {
 	if (!checkIfValidUserID(userID) || !checkIfValidPasswordID(passwordID)) {
 		return new Promise((resolve, reject) => {
 			reject('Invalid UserID and/or PasswordID');
 		});
 	}
+	updateUserLastAccess(userID);
 
 	const updates = {};
 	updates[`/users/${userID}/passwords/${passwordID}`] = updatedPasswordDetails;
-	
-	updateUserLastAccess(userID);
+
 
 	firebase.database().ref().update(updates);
 };
@@ -117,8 +111,11 @@ const deletePassword = (userID, passwordID) => {
 	if (!checkIfValidUserID(userID) || !checkIfValidPasswordID(passwordID)) {
 		return;
 	}
+	updateUserLastAccess(userID);
 
-	firebase.database().ref(`/users/${userID}/passwords/${passwordID}`).remove();
+	const passRef = getPassReference(userID, passwordID);
+
+	passRef.remove();
 };
 
 export default {
