@@ -45,6 +45,9 @@ const getUserReference =
 const getPassReference =
 	(userID, passwordID) => firebase.database().ref(`/users/${userID}/passwords/${passwordID}`);
 
+const getMasterPassReference =
+	(userID) => firebase.database().ref(`/users/${userID}/masterPassword`);
+
 const createNewUser = (userID) => {
 	if (!checkIfValidUserID(userID)) { return; }
 
@@ -118,10 +121,32 @@ const deletePassword = (userID, passwordID) => {
 	passRef.remove();
 };
 
+const setMasterPassword = (userID, masterPassword) => {
+	if (!checkIfValidUserID(userID) || !masterPassword) { return; }
+	updateUserLastAccess(userID);
+
+	const masterPassRef = firebase.database().ref(`/users/${userID}/masterPassword`);
+
+	masterPassRef.set(masterPassword);
+};
+
+const checkIfMasterPasswordSet = (userID) => {
+	if (!checkIfValidUserID) {
+		return new Promise.reject('Invalid UserID');
+	}
+	updateUserLastAccess(userID);
+
+	const masterPassRef = getMasterPassReference(userID);
+
+	return masterPassRef.once('value');
+};
+
 export default {
 	checkIfUserExists,
 	createNewUser,
 	deleteUser,
+	setMasterPassword,
+	checkIfMasterPasswordSet,
 	createNewPassword,
 	editPassword,
 	deletePassword,
