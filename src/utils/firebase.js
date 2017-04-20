@@ -1,12 +1,8 @@
-/* eslint-disable */
-
 import * as firebase from 'firebase';
-import bcrypt from 'bcryptjs';
-import sjcl from 'sjcl';
-import config from '../config/firebase';
 import secret from '../config/secret';
+import securityUtils from './security-utils';
 
-firebase.initializeApp(config);
+firebase.initializeApp(securityUtils.decrypt(secret.firebase));
 
 const checkIfValidUserID = (userID) => {
 	const isValid = 
@@ -51,12 +47,6 @@ const getPassReference =
 const getMasterPassReference =
 	(userID) => firebase.database().ref(`/users/${userID}/masterPassword`);
 
-const encryptPassword = 
-	(password) => sjcl.encrypt(secret.key, JSON.stringify(password));
-
-const decryptPassword =
-	(encryptedPassword) => sjcl.decrypt(secret.key, encryptedPassword);
-
 const createNewUser = (userID) => {
 	if (!checkIfValidUserID(userID)) { return; }
 
@@ -93,9 +83,7 @@ const createNewPassword = (userID, passwordDetails) => {
 		updatedAt: Date.now(),
 	};
 
-	const encryptedPassInfo = sjcl.encrypt(secret.key, JSON.stringify(newPassword))
-	
-	const encrypted = sjcl.encrypt(secret.key, JSON.stringify(newPassword));
+	const encryptedPassInfo = securityUtils.encrypt(newPassword);
 
 	passRef.set(encryptedPassInfo);
 };
@@ -121,7 +109,7 @@ const editPassword = (userID, passwordID, updatedPassword) => {
 	updateUserLastAccess(userID);
 
 	const updates = {
-		[`/users/${userID}/passwords/${passwordID}`]: encryptPassword(updatedPassword),
+		[`/users/${userID}/passwords/${passwordID}`]: securityUtils.encrypt(updatedPassword),
 	};
 
 	firebase.database().ref().update(updates);
@@ -142,7 +130,7 @@ const setMasterPassword = (userID, masterPassword) => {
 	if (!checkIfValidUserID(userID) || !masterPassword) { return; }
 	updateUserLastAccess(userID);
 
-	const hash = bcrypt.hashSync(masterPassword, 10);
+	const hash = securityUtils.generatePasswordHash(masterPassword);
 	const masterPassRef = getMasterPassReference(userID);
 
 	masterPassRef.set(hash);
@@ -168,7 +156,7 @@ const checkIfMasterPasswordIsValid = (userID, masterPassword) => {
 				const hash = user.val().masterPassword;
 
 				// Returns true if positive match, otherwise false
-				return bcrypt.compareSync(masterPassword, hash);
+				return securityUtils.compareHashToPassword(masterPassword, hash);
 			}
 		})
 		.catch((err) => { console.log(err); });
