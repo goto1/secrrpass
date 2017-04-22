@@ -2,11 +2,19 @@ import * as firebase from 'firebase';
 import secret from '../config/secret';
 import securityUtils from './security-utils';
 
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/throw';
+import 'rxjs/add/operator/delay';
+
+// import 'rxjs/add/operator/map';
+
 firebase.initializeApp(securityUtils.decrypt(secret.firebase));
 
 const checkIfValidUserID = (userID) => {
+	const regex = /^\w{6}$/;
 	const isValid = 
-		(typeof userID === 'string' && userID.length === 6) ? true : false;
+		(typeof userID === 'string' && regex.test(userID)) ? true : false;
 
 	return isValid;
 }
@@ -88,16 +96,18 @@ const createNewPassword = (userID, passwordDetails) => {
 	passRef.set(encryptedPassInfo);
 };
 
-const getAllPasswords = (userID) => {
-	if (!checkIfValidUserID) {
-		return new Promise.reject('Invalid UserID');
+const getUserPasswords = (userID) => {
+	if (!checkIfValidUserID(userID)) {
+		return Observable.throw(new Error('Invalid UserID'));
 	}
 	updateUserLastAccess(userID);
 
 	const passwordsRef = 
 		firebase.database().ref(`/users/${userID}/passwords`);
 
-	return passwordsRef.once('value');
+	return Observable
+					.fromPromise(passwordsRef.once('value'))
+					.delay(2000);
 }
 
 const editPassword = (userID, passwordID, updatedPassword) => {
@@ -172,5 +182,6 @@ export default {
 	createNewPassword,
 	editPassword,
 	deletePassword,
-	getAllPasswords,
+	getUserPasswords,
+	updateUserLastAccess,
 };
