@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Route } from 'react-router-dom';
+import React from 'react';
+import { Route, Switch } from 'react-router-dom';
 import Header from '../containers/header';
 import PasswordList from '../containers/password-list';
 import AddPassword from '../containers/add-password';
@@ -27,9 +27,12 @@ const MainLayout = () => (
 	<div style={styles.layout}>
 		<Header />
 		<div style={styles.content}>
-			<Route path="/:userID?" component={PasswordList} />
-			<Route path="/:userID/add" component={AddPassword} />
-			<Route path="/:userID/settings" component={Settings} />
+			<Switch>
+				<Route exact path="/" component={PasswordList} />
+				<Route path="/add" component={AddPassword} />
+				<Route path="/settings" component={Settings} />
+				<Route path="/:userID" component={PasswordList} />
+			</Switch>
 		</div>
 	</div>
 );
