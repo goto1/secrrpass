@@ -1,13 +1,10 @@
-/**
- * Form utilities
- */
+import * as _ from 'lodash';
 
-// Checks if form is valid
 const checkIfFormValid = (formFields) => {
-	const formFieldTypes = Object.keys(formFields);
-	const validInputFields = formFieldTypes.filter(name => formFields[name].valid);
+	const isValid = _.reduce(formFields, 
+		(result, value) => result && value.valid, true);
 
-	return formFieldTypes.length === validInputFields.length;
+	return isValid;
 };
 
 const formUtils = {
