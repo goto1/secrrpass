@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import Card from './layouts/card';
+import formUtils from '../utils/form';
+import firebase from '../utils/firebase';
 import './settings.css';
 
 class TextInputField extends Component {
@@ -50,36 +52,62 @@ class TextInputField extends Component {
 	}
 }
 
-class ChangeUsernameForm extends Component {
+class SetMasterPassword extends Component {
 	constructor() {
 		super();
-		this.state = { username: '', password: '' };
+		this.state = {
+			formFields: {
+				password: { value: '', valid: false },
+				passwordRepeated: { value: '', valid: false },
+			},
+			submitted: false,
+			error: false,
+		};
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleInputFieldChange = this.handleInputFieldChange.bind(this);
+		this.checkIfValidForm = this.checkIfValidForm.bind(this);
 	}
 
 	handleSubmit(event) {
 		event.preventDefault();
-		// const { username, password } = this.state;
-		// TODO: handle username change
+		const { value } = this.state.formFields.password;
+		const userID = localStorage.getItem('userID');
+
+		firebase.setMasterPassword(userID, value)
+			.subscribe(
+				() => this.setState({ submitted: true }),
+				(err) => this.setState({ error: true }),
+			);
 	}
 
 	handleInputFieldChange({ name, value }) {
-		this.setState({ [name]: value });
+		const item = { value, valid: value.length > 0 ? true : false };
+		const updated = {...this.state.formFields, [name]: item};
+		
+		this.setState({ formFields: updated });
+	}
+
+	checkIfValidForm() {
+		const { password, passwordRepeated } = this.state.formFields;
+		const passwordMatching = password.value === passwordRepeated.value;
+
+		return formUtils.checkIfFormValid(this.state.formFields) && passwordMatching;
 	}
 
 	render() {
+		const isFormValid = this.checkIfValidForm();
+
 		return (
-			<form className="Form" onSubmit={this.handleSubmit}>
+			<form className='Form' onSubmit={this.handleSubmit}>
 				<TextInputField
-					name="username" 
-					placeholder="New username"
+					name='password'
+					placeholder='Master password'
 					onChange={this.handleInputFieldChange} />
 				<TextInputField
-					name="password"
-					placeholder="Current password"
+					name='passwordRepeated'
+					placeholder='Repeat password'
 					onChange={this.handleInputFieldChange} />
-				<input type="submit" value="Submit" />
+				<input type="submit" value="Submit" disabled={!isFormValid} />
 			</form>
 		);
 	}
@@ -196,9 +224,9 @@ class SettingsOption extends Component {
 	}
 }
 
-const ChangeUsernameOption = () => {
-	const form = <ChangeUsernameForm key='1' />;
-	return <SettingsOption desc="Change Username" form={form} />;
+const SetMasterPasswordOption = () => {
+	const form = <SetMasterPassword key='1' />
+	return <SettingsOption desc='Set Master Password' form={form} />;
 };
 
 const ChangePasswordOption = () => {
@@ -213,7 +241,7 @@ const DeleteAccountOption = () => {
 
 const Settings = () => (
 	<Card heading="Settings">
-		<ChangeUsernameOption />
+		<SetMasterPasswordOption />
 		<ChangePasswordOption />
 		<DeleteAccountOption />
 	</Card>
