@@ -60,13 +60,13 @@ class PasswordItem extends Component {
 	}
 
 	render() {
-		const { id } = this.props;
-		const passOptions = <PasswordOptions key={id.toString()} id={id} />;
+		const { serviceName, userName, id } = this.props;
+		const passOptions = <PasswordOptions key={id} id={id} />;
 		return (
 			<div className="PasswordItem">
 				<PasswordDetails 
-					serviceName={this.props.password.name}
-					userName={this.props.password.username}
+					serviceName={serviceName}
+					userName={userName}
 					hideIcon={this.state.showOptions}
 					toggleOptions={this.toggleOptions} />
 				<ReactCSSTransitionGroup
