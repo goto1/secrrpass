@@ -76,7 +76,7 @@ const createNewPassword = (userID, passwordDetails) => {
 	}
 	updateUserLastAccess(userID).subscribe();
 
-	const passID = firebase.database.ref().child('passwords').push().key;
+	const passID = firebase.database().ref().child('passwords').push().key;
 	const passRef = getPassReference(userID, passID);
 	const { serviceName, userName, password } = passwordDetails;
 	const newPass = {
@@ -148,19 +148,14 @@ const setMasterPassword = (userID, password) => {
 	return Observable.fromPromise(masterPassRef.set(hash));
 };
 
-const checkIfMasterPasswordIsValid = (userID, masterPassword) => {
-	if (!checkIfValidUserID || !masterPassword) { return; }
+const getMasterPassword = (userID) => {
+	if (!checkIfValidUserID(userID)) {
+		return Observable.throw(new Error('Invalid UserID'));
+	}
 
-	checkIfUserExists(userID)
-		.then((user) => {
-			if (user.val() !== null) {
-				const hash = user.val().masterPassword;
+	const masterPassRef = getMasterPassReference(userID);
 
-				// Returns true if positive match, otherwise false
-				return securityUtils.compareHashToPassword(masterPassword, hash);
-			}
-		})
-		.catch((err) => { console.log(err); });
+	return Observable.fromPromise(masterPassRef.once('value'));
 };
 
 export default {
@@ -169,82 +164,10 @@ export default {
 	deleteUser,
 	setMasterPassword,
 	checkIfMasterPasswordIsSet,
-	checkIfMasterPasswordIsValid,
+	getMasterPassword,
 	createNewPassword,
 	editPassword,
 	deletePassword,
 	getUserPasswords,
 	updateUserLastAccess,
 };
-
-// const getUserPasswords = (userID) => {
-// 	if (!checkIfValidUserID(userID)) {
-// 		return Observable.throw(new Error('Invalid UserID'));
-// 	}
-
-// 	const extractData = (data) => data.val();
-
-// 	checkIfUserExists(userID)
-// 		.map(extractData)
-// 		.subscribe(
-// 			(user) => console.log(user),
-// 			(err) => console.log(err),
-// 		);
-
-// 	updateUserLastAccess(userID);
-
-// 	const passwordsRef = 
-// 		firebase.database().ref(`/users/${userID}/passwords`);
-
-// 	return Observable.fromPromise(passwordsRef.once('value')).delay(2000);
-// }
-// const createNewPassword = (userID, passwordDetails) => {
-// 	if (!checkIfValidUserID(userID) || !passwordDetails) { return; }
-// 	updateUserLastAccess(userID);
-
-// 	const passwordID = firebase.database().ref().child('passwords').push().key;
-// 	const passRef = getPassReference(userID, passwordID);
-
-// 	const { serviceName, userName, password } = passwordDetails;
-
-// 	const newPassword = {
-// 		serviceName: serviceName || '',
-// 		userName: userName || '',
-// 		password: password || '',
-// 		createdAt: Date.now(),
-// 		updatedAt: Date.now(),
-// 	};
-
-// 	const encryptedPassInfo = securityUtils.encrypt(newPassword);
-
-// 	passRef.set(encryptedPassInfo);
-// };
-// const setMasterPassword = (userID, masterPassword) => {
-// 	if (!checkIfValidUserID(userID) || !masterPassword) { return; }
-// 	updateUserLastAccess(userID);
-
-// 	const hash = securityUtils.generatePasswordHash(masterPassword);
-// 	const masterPassRef = getMasterPassReference(userID);
-
-// 	masterPassRef.set(hash);
-// };
-// const deletePassword = (userID, passwordID) => {
-// 	if (!checkIfValidUserID(userID) || !checkIfValidPasswordID(passwordID)) {
-// 		return;
-// 	}
-// 	updateUserLastAccess(userID);
-
-// 	const passRef = getPassReference(userID, passwordID);
-
-// 	passRef.remove();
-// };
-// const checkIfMasterPasswordIsSet = (userID) => {
-// 	if (!checkIfValidUserID) {
-// 		return new Promise.reject('Invalid UserID');
-// 	}
-// 	updateUserLastAccess(userID);
-
-// 	const masterPassRef = getMasterPassReference(userID);
-
-// 	return masterPassRef.once('value');
-// };
