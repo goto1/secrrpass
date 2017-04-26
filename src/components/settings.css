@@ -89,3 +89,27 @@
 	transition: opacity 500ms ease-in-out, max-height 500ms ease-in-out;
 }
 
+.SuccessfulSubmission {
+	padding: 0;
+	color: #40E86D;
+	font-size: 17.5px;
+	letter-spacing: 1.25px;
+	text-transform: uppercase;
+	padding: 10px 0;
+	display: flex;
+	flex-flow: column;
+}
+
+.SuccessfulSubmission button {
+	display: block;
+	border: 1px solid #40E86D;
+	margin: 10px 0;
+	font-size: 15px;
+	padding: 5px 10px;
+	width: 100px;
+	align-self: flex-end;
+	cursor: pointer;
+}
+
+
+

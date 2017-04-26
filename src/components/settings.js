@@ -5,6 +5,13 @@ import formUtils from '../utils/form';
 import firebase from '../utils/firebase';
 import './settings.css';
 
+const SuccessfulSubmission = ({ message, action }) => (
+	<div className='SuccessfulSubmission'>
+		{message}
+		<button type="button" onClick={action}>Go Back</button>
+	</div>
+);
+
 class TextInputField extends Component {
 	constructor(props) {
 		super(props);
@@ -66,6 +73,7 @@ class SetMasterPassword extends Component {
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleInputFieldChange = this.handleInputFieldChange.bind(this);
 		this.checkIfValidForm = this.checkIfValidForm.bind(this);
+		this.goBack = this.goBack.bind(this);
 	}
 
 	handleSubmit(event) {
@@ -88,27 +96,48 @@ class SetMasterPassword extends Component {
 	}
 
 	checkIfValidForm() {
+		const { checkIfFormValid, checkIfFieldsMatching } = formUtils;
+		const { formFields } = this.state;
 		const { password, passwordRepeated } = this.state.formFields;
-		const passwordMatching = password.value === passwordRepeated.value;
 
-		return formUtils.checkIfFormValid(this.state.formFields) && passwordMatching;
+		return checkIfFormValid(formFields) && checkIfFieldsMatching(password, passwordRepeated);
+	}
+
+	goBack() {
+		this.setState({
+			formFields: {
+				password: { value: '', valid: false },
+				passwordRepeated: { value: '', valid: false },
+			},
+			submitted: false,
+			error: false,
+		});
 	}
 
 	render() {
 		const isFormValid = this.checkIfValidForm();
+		const submissionMessage = 'Your master password was successfully set!';
 
 		return (
-			<form className='Form' onSubmit={this.handleSubmit}>
-				<TextInputField
-					name='password'
-					placeholder='Master password'
-					onChange={this.handleInputFieldChange} />
-				<TextInputField
-					name='passwordRepeated'
-					placeholder='Repeat password'
-					onChange={this.handleInputFieldChange} />
-				<input type="submit" value="Submit" disabled={!isFormValid} />
-			</form>
+			<div>
+				{ this.state.submitted ? (
+					<SuccessfulSubmission 
+						message={submissionMessage} 
+						action={this.goBack} />
+				) : (
+					<form className='Form' onSubmit={this.handleSubmit}>
+						<TextInputField
+							name='password'
+							placeholder='Master password'
+							onChange={this.handleInputFieldChange} />
+						<TextInputField
+							name='passwordRepeated'
+							placeholder='Repeat password'
+							onChange={this.handleInputFieldChange} />
+						<input type="submit" value="Submit" disabled={!isFormValid} />
+					</form>
+				) }
+			</div>
 		);
 	}
 }
@@ -116,37 +145,60 @@ class SetMasterPassword extends Component {
 class ChangePasswordForm extends Component {
 	constructor() {
 		super();
-		this.state = { currPassword: '', newPassword: '', newPasswordRepeated: '' };
+		this.state = {
+			formFields: {
+				currPass: { value: '', valid: false },
+				newPass: { value: '', valid: false },
+				newPassRepeated: { value: '', valid: false },
+			},
+			submitted: false,
+			error: false,
+		};
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleInputFieldChange = this.handleInputFieldChange.bind(this);
+		this.checkIfValidForm = this.checkIfValidForm.bind(this);
 	}
 
 	handleSubmit(event) {
 		event.preventDefault();
-		// const { newPassword } = this.state;
-		// TODO: handle password change
+		const { currPass, newPass, newPassRepeated } = this.state.formFields;
+
+		console.log(currPass, newPass, newPassRepeated);
 	}
 
 	handleInputFieldChange({ name, value }) {
-		this.setState({ [name]: value });
+		const item = { value, valid: value.length > 0 ? true : false };
+		const updated = {...this.state.formFields, [name]: item};
+		
+		this.setState({ formFields: updated });
+	}
+
+	checkIfValidForm() {
+		const { checkIfFormValid, checkIfFieldsMatching } = formUtils;
+		const { formFields } = this.state;
+		const { password, passwordRepeated } = this.state.formFields;
+
+		return checkIfFormValid(formFields) && checkIfFieldsMatching(password, passwordRepeated);
 	}
 
 	render() {
+		const isFormValid = this.checkIfValidForm();
+
 		return (
 			<form className="Form" onSubmit={this.handleSubmit}>
 				<TextInputField
-					name="currPassword"
+					name="currPass"
 					placeholder="Current password"
 					onChange={this.handleInputFieldChange} />
 				<TextInputField
-					name="newPassword"
+					name="newPass"
 					placeholder="New password"
 					onChange={this.handleInputFieldChange} />
 				<TextInputField
-					name="newPasswordRepeated"
+					name="newPassRepeated"
 					placeholder="Repeat new password"
 					onChange={this.handleInputFieldChange} />
-				<input type="submit" value="Submit" />
+				<input type="submit" value="Submit" disabled={!isFormValid} />
 			</form>
 		);
 	}
