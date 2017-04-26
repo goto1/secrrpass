@@ -3,6 +3,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import Card from './layouts/card';
 import formUtils from '../utils/form';
 import firebase from '../utils/firebase';
+import securityUtils from '../utils/security-utils';
 import './settings.css';
 
 const SuccessfulSubmission = ({ message, action }) => (
@@ -157,13 +158,29 @@ class ChangePasswordForm extends Component {
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleInputFieldChange = this.handleInputFieldChange.bind(this);
 		this.checkIfValidForm = this.checkIfValidForm.bind(this);
+		this.goBack = this.goBack.bind(this);
 	}
 
 	handleSubmit(event) {
 		event.preventDefault();
 		const { currPass, newPass, newPassRepeated } = this.state.formFields;
+		const userID = localStorage.getItem('userID');
 
-		console.log(currPass, newPass, newPassRepeated);
+		const extract = data => data.val();
+
+		firebase.getMasterPassword(userID)
+			.map(extract)
+			.subscribe(
+				(hash) => {
+					if (securityUtils.compareHashToPassword(currPass.value, hash)) {
+						firebase.setMasterPassword(userID, newPass.value).subscribe();
+						this.setState({ submitted: true });
+					} else {
+						this.setState({ error: true });
+					}
+				},
+				(err) => { console.log(err); },
+			);
 	}
 
 	handleInputFieldChange({ name, value }) {
@@ -176,30 +193,51 @@ class ChangePasswordForm extends Component {
 	checkIfValidForm() {
 		const { checkIfFormValid, checkIfFieldsMatching } = formUtils;
 		const { formFields } = this.state;
-		const { password, passwordRepeated } = this.state.formFields;
+		const { newPass, newPassRepeated } = this.state.formFields;
 
-		return checkIfFormValid(formFields) && checkIfFieldsMatching(password, passwordRepeated);
+		return checkIfFormValid(formFields) && checkIfFieldsMatching(newPass, newPassRepeated);
+	}
+
+	goBack() {
+		this.setState({
+			formFields: {
+				currPass: { value: '', valid: false },
+				newPass: { value: '', valid: false },
+				newPassRepeated: { value: '', valid: false },
+			},
+			submitted: false,
+			error: false,
+		});
 	}
 
 	render() {
 		const isFormValid = this.checkIfValidForm();
+		console.log(this.state.submitted);
 
 		return (
-			<form className="Form" onSubmit={this.handleSubmit}>
-				<TextInputField
-					name="currPass"
-					placeholder="Current password"
-					onChange={this.handleInputFieldChange} />
-				<TextInputField
-					name="newPass"
-					placeholder="New password"
-					onChange={this.handleInputFieldChange} />
-				<TextInputField
-					name="newPassRepeated"
-					placeholder="Repeat new password"
-					onChange={this.handleInputFieldChange} />
-				<input type="submit" value="Submit" disabled={!isFormValid} />
-			</form>
+			<div>
+				{ this.state.submitted ? (
+					<SuccessfulSubmission
+						message='You have successfully changed your master password!'
+						action={this.goBack} />
+				) : (
+					<form className="Form" onSubmit={this.handleSubmit}>
+						<TextInputField
+							name="currPass"
+							placeholder="Current password"
+							onChange={this.handleInputFieldChange} />
+						<TextInputField
+							name="newPass"
+							placeholder="New password"
+							onChange={this.handleInputFieldChange} />
+						<TextInputField
+							name="newPassRepeated"
+							placeholder="Repeat new password"
+							onChange={this.handleInputFieldChange} />
+						<input type="submit" value="Submit" disabled={!isFormValid} />
+					</form>
+				) }
+			</div>
 		);
 	}
 }
