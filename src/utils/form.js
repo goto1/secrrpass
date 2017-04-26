@@ -7,8 +7,11 @@ const checkIfFormValid = (formFields) => {
 	return isValid;
 };
 
+const checkIfFieldsMatching = (field1, field2) => field1.value === field2.value;
+
 const formUtils = {
 	checkIfFormValid,
+	checkIfFieldsMatching,
 };
 
 export default formUtils;
