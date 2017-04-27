@@ -77,6 +77,10 @@ class SetMasterPassword extends Component {
 		this.goBack = this.goBack.bind(this);
 	}
 
+	// componentWillUnmount() {
+	// 	firebase.setMasterPassword(userID, value).unsubscribe();
+	// }
+
 	handleSubmit(event) {
 		event.preventDefault();
 		const { value } = this.state.formFields.password;
