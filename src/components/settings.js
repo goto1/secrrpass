@@ -78,7 +78,7 @@ class SetMasterPassword extends Component {
 	}
 
 	// componentWillUnmount() {
-	// 	firebase.setMasterPassword(userID, value).unsubscribe();
+	// 	firebase.setMasterPassword().unsubscribe();
 	// }
 
 	handleSubmit(event) {
@@ -256,8 +256,11 @@ class DeleteAccountForm extends Component {
 
 	handleSubmit(event) {
 		event.preventDefault();
-		// const { password } = this.state;
-		// TODO: handle deletion of account
+		const userID = localStorage.getItem('userID');
+
+		firebase.deleteUser(userID).subscribe();
+		localStorage.removeItem('userID');
+		// TODO: redirect to the front page
 	}
 
 	handleInputFieldChange({ name, value }) {
