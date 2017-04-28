@@ -35,10 +35,10 @@ const NavigationMenu = () => {
 			<Link to={userID ? `/${userID}` : '/'}>
 				<NavItem type='home' />
 			</Link>
-			<Link to={userID ? `/${userID}/add` : '/add'}>
+			<Link to='/add'>
 				<NavItem type='plus' />
 			</Link>
-			<Link to={userID ? `/${userID}/settings` : '/settings'}>
+			<Link to='/settings'>
 				<NavItem type='user' />
 			</Link>
 		</div>
