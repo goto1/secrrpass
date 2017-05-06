@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router';
 import PasswordItem from '../containers/password-item';
 import Loader from '../views/loader';
 import firebase from '../../utils/firebase';
@@ -22,12 +23,15 @@ class PasswordList extends Component {
 		this.state = {
 			showLoader: true,
 			passwords: [],
-		}
+			newUser: false,
+		};
 	}
 
 	componentWillMount() {
 		const { match } = this.props;
 		const userID = match.params.userID || genUserID();
+
+		localStorage.setItem('userID', userID);
 
 		const extractData = (data) => data.val() || null;
 
@@ -37,10 +41,10 @@ class PasswordList extends Component {
 				(user) => {
 					if (!user) {
 						firebase.createNewUser(userID).subscribe();
+						this.setState({ newUser: true });
 					} else {
 						firebase.updateUserLastAccess(userID).subscribe();
 					}
-					localStorage.setItem('userID', userID);
 				},
 				(err) => { console.log(err); },
 			);
@@ -70,6 +74,9 @@ class PasswordList extends Component {
 	}
 
 	render() {
+		const currPath = this.props.location.pathname;
+		const expectedPath = `/${localStorage.getItem('userID')}`;
+
 		let passwordList = null;
 
 		if (this.state.passwords) {
@@ -80,6 +87,8 @@ class PasswordList extends Component {
 
 		return (
 			<div className="PasswordList">
+				{ (currPath !== expectedPath) && <Redirect to={expectedPath} /> }
+
 				{ this.state.showLoader && <Loader /> }
 
 				{ passwordList ? (
