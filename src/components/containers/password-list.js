@@ -5,6 +5,7 @@ import Loader from '../views/loader';
 import firebase from '../../utils/firebase';
 import securityUtils from '../../utils/security-utils';
 import genUserID from '../../utils/id-generator';
+import * as _ from 'lodash';
 import './password-list.css';
 
 const NoPasswordsToShow = () => (
@@ -22,9 +23,11 @@ class PasswordList extends Component {
 		super(props);
 		this.state = {
 			showLoader: true,
-			passwords: [],
+			passwords: null,
 			newUser: false,
 		};
+		this.deletePassword = this.deletePassword.bind(this);
+		this.getListOfPasswords = this.getListOfPasswords.bind(this);
 	}
 
 	componentWillMount() {
@@ -56,12 +59,17 @@ class PasswordList extends Component {
 		const extractData = (data) => data.val();
 		const decryptData = (data) => {
 			if (data) {
-				return Object.keys(data).map((id) => {
-					const decrypted = securityUtils.decrypt(data[id]);
-					return { id, ...decrypted };
+				const clone = Object.assign({}, data);
+				const decrypted = {};
+
+				Object.keys(clone).map((id) => {
+					decrypted[id] = securityUtils.decrypt(clone[id]);
 				});
+
+				return decrypted;
 			}
-			return data;
+
+			return {};
 		};
 
 		firebase.getUserPasswords(userID)
@@ -73,17 +81,73 @@ class PasswordList extends Component {
 			);
 	}
 
-	render() {
-		const currPath = this.props.location.pathname;
-		const expectedPath = `/${localStorage.getItem('userID')}`;
+	deletePassword(passwordID) {
+		const userID = localStorage.getItem('userID');
 
-		let passwordList = null;
+		firebase.deletePassword(userID, passwordID)
+			.subscribe(
+				(res) => {
+					console.log(res);
+					// const updatedPassword = _.remove(this.state.passwords, ())
+				},
+				(err) => console.log(err),
+			);
 
-		if (this.state.passwords) {
-			passwordList = this.state.passwords.map(
+
+	}
+
+	getListOfPasswords() {
+		const { passwords } = this.state;
+
+		if (passwords) {
+			const temp = [];
+
+			_.forIn(passwords, (value, key) => {
+				temp.push({ id: key, ...value });
+			});
+
+			return temp.map(
 				password => <PasswordItem key={password.id} {...password} />
 			);
 		}
+
+		return null;
+	}
+
+	render() {
+		const currPath = this.props.location.pathname;
+		const expectedPath = `/${localStorage.getItem('userID')}`;
+		const passwordList = this.getListOfPasswords();
+
+		// this.getListOfPasswords();
+
+		// this.getListOfPasswords();
+
+		// console.log(this.state.passwords);
+
+		// if (this.state.passwords) {
+		// 	const passwords = {};
+
+
+		// 	const test = _.forIn(this.state.passwords, 
+		// 		(value, key) => <PasswordItem key={key}
+		// 	);
+		// 	_.forIn(this.state.passwords, (value, key) => {
+
+		// 		console.log('key', key);
+		// 		console.log('value', value);
+		// 	});
+
+		// 	// Object.keys(this.state.passwords).map((password, idx) => {
+		// 	// 	console.log(idx, password);
+		// 	// });
+		// }
+
+		// // if (this.state.passwords) {
+		// // 	passwordList = this.state.passwords.map(
+		// // 		password => <PasswordItem key={password.id} {...password} />
+		// // 	);
+		// // }
 
 		return (
 			<div className="PasswordList">
