@@ -76,12 +76,14 @@ class PasswordOptions extends Component {
 
 	onEdit() {
 		const { id } = this.props;
+
 		console.log(`password (${id}) edit action`);
 	}
 
 	onDelete() {
-		const { id } = this.props;
-		console.log(`password (${id}) delete action`);
+		const { id, deletePassword } = this.props;
+
+		deletePassword(id);
 	}
 
 	render() {

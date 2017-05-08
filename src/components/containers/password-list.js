@@ -5,7 +5,7 @@ import Loader from '../views/loader';
 import firebase from '../../utils/firebase';
 import securityUtils from '../../utils/security-utils';
 import genUserID from '../../utils/id-generator';
-import * as _ from 'lodash';
+import { forIn, remove } from 'lodash';
 import './password-list.css';
 
 const NoPasswordsToShow = () => (
@@ -84,30 +84,34 @@ class PasswordList extends Component {
 	deletePassword(passwordID) {
 		const userID = localStorage.getItem('userID');
 
-		firebase.deletePassword(userID, passwordID)
-			.subscribe(
-				(res) => {
-					console.log(res);
-					// const updatedPassword = _.remove(this.state.passwords, ())
-				},
-				(err) => console.log(err),
-			);
+		console.log('Password to be deleted', passwordID);
 
+		// firebase.deletePassword(userID, passwordID)
+		// 	.subscribe(
+		// 		(res) => {
+		// 			console.log(res);
 
+		// 			// const updatedPassword = _.remove(this.state.passwords, ())
+		// 		},
+		// 		(err) => console.log(err),
+		// 	);
 	}
 
 	getListOfPasswords() {
 		const { passwords } = this.state;
+		const actions = {
+			deletePassword: this.deletePassword,
+		};
 
 		if (passwords) {
 			const temp = [];
 
-			_.forIn(passwords, (value, key) => {
+			forIn(passwords, (value, key) => {
 				temp.push({ id: key, ...value });
 			});
 
 			return temp.map(
-				password => <PasswordItem key={password.id} {...password} />
+				password => <PasswordItem key={password.id} {...password} {...actions} />
 			);
 		}
 
@@ -118,36 +122,6 @@ class PasswordList extends Component {
 		const currPath = this.props.location.pathname;
 		const expectedPath = `/${localStorage.getItem('userID')}`;
 		const passwordList = this.getListOfPasswords();
-
-		// this.getListOfPasswords();
-
-		// this.getListOfPasswords();
-
-		// console.log(this.state.passwords);
-
-		// if (this.state.passwords) {
-		// 	const passwords = {};
-
-
-		// 	const test = _.forIn(this.state.passwords, 
-		// 		(value, key) => <PasswordItem key={key}
-		// 	);
-		// 	_.forIn(this.state.passwords, (value, key) => {
-
-		// 		console.log('key', key);
-		// 		console.log('value', value);
-		// 	});
-
-		// 	// Object.keys(this.state.passwords).map((password, idx) => {
-		// 	// 	console.log(idx, password);
-		// 	// });
-		// }
-
-		// // if (this.state.passwords) {
-		// // 	passwordList = this.state.passwords.map(
-		// // 		password => <PasswordItem key={password.id} {...password} />
-		// // 	);
-		// // }
 
 		return (
 			<div className="PasswordList">
