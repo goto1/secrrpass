@@ -95,7 +95,7 @@ class AddPasswordForm extends Component {
 		const { formFields } = this.state;
 		const password = {
 			serviceName: formFields.name.value,
-			userName: formFields.name.value,
+			userName: formFields.username.value,
 			password: formFields.password.value,
 		};
 
