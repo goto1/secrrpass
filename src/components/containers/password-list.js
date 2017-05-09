@@ -84,17 +84,16 @@ class PasswordList extends Component {
 	deletePassword(passwordID) {
 		const userID = localStorage.getItem('userID');
 
-		console.log('Password to be deleted', passwordID);
+		firebase.deletePassword(userID, passwordID)
+			.subscribe(
+				(res) => {
+					const copyOfPasswords = Object.assign({}, this.state.passwords);
+					delete copyOfPasswords[passwordID];
 
-		// firebase.deletePassword(userID, passwordID)
-		// 	.subscribe(
-		// 		(res) => {
-		// 			console.log(res);
-
-		// 			// const updatedPassword = _.remove(this.state.passwords, ())
-		// 		},
-		// 		(err) => console.log(err),
-		// 	);
+					this.setState({ passwords: copyOfPasswords });
+				},
+				(err) => { console.log(err); }
+			);
 	}
 
 	getListOfPasswords() {
