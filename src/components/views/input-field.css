@@ -1,0 +1,35 @@
+.InputField {
+	overflow: hidden;
+}
+
+.InputField label {
+	margin: 0px auto 35px auto;
+	overflow: hidden;
+}
+
+.InputField span {
+	font-size: 17.5px;
+	color: #F3F3F5;
+	letter-spacing: 1.25px;
+	display: inline-block;
+}
+
+.InputField input {
+	border: none;
+	padding: 15px 15px 10px 15px;
+	background: inherit;
+	border-bottom-width: 3px;
+	border-bottom-style: solid;
+	border-bottom: 3px solid #1F224A;
+	width: 100%;
+	letter-spacing: 1.25px;
+	color: #F3F3F5;
+	font-weight: 300;
+	transform: all 500ms ease-in-out;
+}
+
+.InputField input::placeholder {
+	color: #F3F3F5;
+	opacity: 0.65;
+	font-size: 15px;
+}
