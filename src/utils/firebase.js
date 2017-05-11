@@ -158,6 +158,17 @@ const getMasterPassword = (userID) => {
 	return Observable.fromPromise(masterPassRef.once('value'));
 };
 
+const logError = (err) => {
+	if (!err) {
+		return Observable.throw('Error object missing');
+	}
+
+	const errorsRef = firebase.database().ref('errors');
+	const newErrorRef = errorsRef.push();
+	
+	newErrorRef.set({ ...err });
+};
+
 export default {
 	checkIfUserExists,
 	createNewUser,
@@ -170,4 +181,5 @@ export default {
 	deletePassword,
 	getUserPasswords,
 	updateUserLastAccess,
+	logError,
 };
