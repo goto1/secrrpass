@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
 
 function formField(attributes, description) {
+	if (!attributes || !description) { return {}; }
+
 	return {
 		attr: { value: '', ...attributes },
 		valid: false,
@@ -29,6 +31,8 @@ function updateFormField(event, formFields) {
 }
 
 function checkIfValidForm(formFields) {
+	if (!formFields) { return false; }
+
 	const isValid = _.reduce(formFields,
 		(result, value) => result && value.valid, true);
 
@@ -36,6 +40,8 @@ function checkIfValidForm(formFields) {
 }
 
 function checkIfMatchingFields(field1, field2) {
+	if (!field1 || !field2) { return false; }
+
 	return field1.value === field2.value;
 }
 
