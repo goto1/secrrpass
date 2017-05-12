@@ -1,15 +1,7 @@
 import React, { Component } from 'react';
 import CardLayout from '../layouts/card';
 import InputField from '../views/input-field';
-
-function formField(attributes, description) {
-	return {
-		attr: { value: '', ...attributes },
-		valid: false,
-		touched: false,
-		desc: description,
-	};
-}
+import { formField, updateFormField } from '../../utils/form';
 
 class EditPassword extends Component {
 	constructor() {
@@ -43,21 +35,10 @@ class EditPassword extends Component {
 
 	handleSubmit() { }
 
-	handleChange(e) {
-		const { name, value } = e.target;
-		const formInput = Object.assign({}, this.state.formFields[name]);
+	handleChange(event) {
+		const updatedFormFields = updateFormField(event, this.state.formFields);
 
-		const updated = {
-			...this.state.formFields,
-			[name]: {
-				...formInput,
-				attr: { ...formInput.attr, value },
-				valid: value.length > 0 ? true : false,
-				touched: true,
-			}
-		};
-
-		this.setState({ formFields: updated });
+		this.setState({ formFields: updatedFormFields });
 	}
 
 	render() {
