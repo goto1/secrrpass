@@ -1,5 +1,6 @@
 .InputField {
 	overflow: hidden;
+	margin-bottom: 25px;
 }
 
 .InputField label {

@@ -1,0 +1,34 @@
+button {
+	cursor: pointer;
+}
+
+button:focus {
+	outline: none;
+}
+
+button:disabled {
+	opacity: .5;
+	cursor: not-allowed;
+}
+
+.btn-submit {
+	font-size: 15px;
+	background: inherit;
+	border: 2px solid #F3F3F5;
+	color: #F3F3F5;
+	font-weight: 200;
+	padding: 5px 15px;
+	text-transform: uppercase;
+}
+
+.btn-default {
+	border: none;
+	background: inherit;
+	color: #EF5A40;
+	letter-spacing: 1px;
+	border-bottom: 1px solid #EF5A40;
+	font-weight: 300;
+	font-size: 13px;
+	padding: 0 5px;
+	text-transform: uppercase;
+}
