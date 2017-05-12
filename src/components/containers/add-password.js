@@ -14,11 +14,41 @@ import {
 import './add-password.css';
 
 function SuccessfulSubmission({ serviceName, showForm }) {
+	const styles = {
+		container: {
+			textAlign: 'center',
+			padding: '10px',
+			marginTop: '25%',
+			padding: '20px',
+			fontWeight: '200',
+			letterSpacing: '2px',
+			lineHeight: '35px',
+		},
+		message: {
+			margin: '30px 0',
+			fontSize: '22.5px',
+			textTransform: 'uppercase',
+			color: '#F3F3F5',
+		},
+		span: { color: '#EF5A40' },
+		button: {
+			display: 'flex',
+			justifyContent: 'space-between',
+			margin: '25px auto',
+		},
+	};
+	const backButton = genDefaultBtn('Add another password', showForm);
+
 	return (
-		<div className="SuccessfulSubmission">
-			<div>Success!</div>
-			<div>Your <span>{serviceName}</span> was created.</div>
-			<button onClick={showForm}>Add Another Password</button>
+		<div style={styles.container}>
+			<div style={styles.message}>
+				<div>
+					Your <span style={styles.span}>{serviceName}</span> password was created!
+				</div>
+			</div>
+			<div style={styles.message}>
+				{ backButton }
+			</div>
 		</div>
 	);
 }
@@ -33,6 +63,7 @@ class AddPasswordForm extends Component {
 					type: 'text',
 					name: 'name',
 					placeholder: 'Gmail',
+					value: 'Test',
 					onChange: this.handleChange.bind(this),
 				}, 'Name'),
 				username: formField({
@@ -72,9 +103,9 @@ class AddPasswordForm extends Component {
 		const userID = localStorage.getItem('userID');
 		const { name, username, password } = this.state.formFields;
 		const newPassword = {
-			serviceName: name.value,
-			userName: username.value,
-			password: password.value,
+			serviceName: name.attr.value,
+			userName: username.attr.value,
+			password: password.attr.value,
 		};
 
 		firebase.createNewPassword(userID, newPassword)
@@ -131,7 +162,7 @@ class AddPasswordForm extends Component {
 					</CardLayout>
 				) : (
 					<SuccessfulSubmission
-							serviceName={name.value}
+							serviceName={name.attr.value}
 							showForm={this.showAndResetForm} />
 				) }
 			</div>
