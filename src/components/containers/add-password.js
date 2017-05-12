@@ -1,53 +1,24 @@
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-import PasswordGeneratorForm from './password-generator-form';
-import FormUtils from '../../utils/form';
 import firebase from '../../utils/firebase';
-import Card from '../layouts/card';
+import PasswordGeneratorForm from './password-generator-form';
+import InputField from '../views/input-field';
+import CardLayout from '../layouts/card';
+import { 
+	genSubmitBtn,
+	genDefaultBtn,
+	formField, 
+	updateFormFields,
+	checkIfValidForm,
+	resetForm } from '../../utils/form';
 import './add-password.css';
 
-const SuccessfulSubmission = (props) => (
-	<div className="SuccessfulSubmission">
-		<div>Success!</div>
-		<div>Your <span>{props.serviceName}</span> was created.</div>
-		<button onClick={props.showForm}>Add Another Password</button>
-	</div>
-);
-
-const GenereateNewPasswordBtn = ({ onClick }) => (
-	<button 
-		type="button" 
-		className="GenerateNewPasswordBtn"
-		onClick={onClick}>
-		Generate New Password
-	</button>
-);
-
-const TextInputField = (props) => {
-	const styles = { borderBottomColor: '' };
-	const { 
-		value, placeholder, 
-		handleChange, valid, 
-		desc, touched, name } = props;
-
-	if (touched && !valid) {
-		styles.borderBottomColor = '#CC0000';
-	} else if (touched > 0) {
-		styles.borderBottomColor = '#35D235';
-	}
-
+function SuccessfulSubmission({ serviceName, showForm }) {
 	return (
-		<div className="TextInputField">
-			<label>
-				<span>{desc}</span>
-				<input 
-					type="text"
-					value={value}
-					name={name}
-					style={styles}
-					onChange={handleChange}
-					placeholder={placeholder} />
-			</label>
+		<div className="SuccessfulSubmission">
+			<div>Success!</div>
+			<div>Your <span>{serviceName}</span> was created.</div>
+			<button onClick={showForm}>Add Another Password</button>
 		</div>
 	);
 }
@@ -55,137 +26,113 @@ const TextInputField = (props) => {
 class AddPasswordForm extends Component {
 	constructor() {
 		super();
+
 		this.state = {
 			formFields: {
-				name: { value: '', valid: false, touched: false },
-				username: { value: '', valid: false, touched: false },
-				password: { value: '', valid: false, touched: false },
+				name: formField({
+					type: 'text',
+					name: 'name',
+					placeholder: 'Gmail',
+					onChange: this.handleChange.bind(this),
+				}, 'Name'),
+				username: formField({
+					type: 'text',
+					name: 'username',
+					placeholder: 'example@gmail.com',
+					onChange: this.handleChange.bind(this),
+				}, 'Username or email address'),
+				password: formField({
+					type: 'text',
+					name: 'password',
+					placeholder: 'E^:24V)6F*lMS>M',
+					onChange: this.handleChange.bind(this),
+				}, 'Enter or generate a new password')
 			},
-			showPassGenerator: false,
-			submitted: false,
-			error: false,
+			formValid: false,
+			formSubmitted: false,
+			showPasswordGenerator: false,
 		};
-		this.handleSubmit = this.handleSubmit.bind(this);
-		this.handleInputChange = this.handleInputChange.bind(this);
-		this.onPassGenerated = this.onPassGenerated.bind(this);
-		this.togglePassGenerator = this.togglePassGenerator.bind(this);
+
+		this.togglePasswordGenerator = this.togglePasswordGenerator.bind(this);
+		this.onPasswordGenerated = this.onPasswordGenerated.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this),
 		this.showAndResetForm = this.showAndResetForm.bind(this);
 	}
 
-	showAndResetForm() {
-		this.setState({
-			formFields: {
-				name: { value: '', valid: false, touched: false },
-				username: { value: '', valid: false, touched: false },
-				password: { value: '', valid: false, touched: false },
-			},
-			submitted: false,
-			error: false,
-		});
-	}
+	handleChange(event) {
+		const formFields = updateFormFields(event, this.state.formFields);
+		const formValid = checkIfValidForm(formFields);
 
-	togglePassGenerator() {
-		this.setState({ showPassGenerator: !this.state.showPassGenerator });
+		this.setState({ formFields, formValid });
 	}
 
 	handleSubmit(event) {
 		event.preventDefault();
 
 		const userID = localStorage.getItem('userID');
-		const { formFields } = this.state;
-		const password = {
-			serviceName: formFields.name.value,
-			userName: formFields.username.value,
-			password: formFields.password.value,
+		const { name, username, password } = this.state.formFields;
+		const newPassword = {
+			serviceName: name.value,
+			userName: username.value,
+			password: password.value,
 		};
 
-		firebase.createNewPassword(userID, password)
+		firebase.createNewPassword(userID, newPassword)
 			.subscribe(
-				() => { this.setState({ submitted: true }); },
-				() => { this.setState({ error: true })}
+				() => { this.setState({ formSubmitted: true }); }
 			);
 	}
 
-	handleInputChange(event) {
-		const { name, value } = event.target;
-		const updatedFormFields = {
-			...this.state.formFields,
-			[name]: {
-				value: value,
-				valid: value.length > 0 ? true : false,
-				touched: true,
-			},
-		};
-
-		this.setState({ formFields: updatedFormFields });
+	togglePasswordGenerator() {
+		this.setState({ showPasswordGenerator: !this.state.showPasswordGenerator });
 	}
 
-	onPassGenerated(pass) {
-		const password = { 
-			value: pass, 
-			valid: pass.length > 0 ? true : false,
-			touched: true 
+	onPasswordGenerated(generatedPassword) {
+		const event = {
+			target: { name: 'password', value: generatedPassword },
 		};
-		const formFields = {...this.state.formFields, password};
-		this.setState({ formFields });
+
+		this.handleChange(event);
+	}
+
+	showAndResetForm() {
+		this.setState({ ...resetForm(this.state) });
 	}
 
 	render() {
-		const passGenerator = <PasswordGeneratorForm onGenerated={this.onPassGenerated} />
-		const { formFields, error, submitted } = this.state;
-		const isFormValid = FormUtils.checkIfFormValid(formFields);
-		
+		const { name, username, password } = this.state.formFields;
+		const PasswordGenerator = 
+			<PasswordGeneratorForm onGenerated={this.onPasswordGenerated} />;
+		const SubmitButton = genSubmitBtn('Submit', this.state.formValid);
+		const ShowPasswordGeneratorButton = 
+			genDefaultBtn('Password generator', this.togglePasswordGenerator);
+
 		return (
 			<div>
-				{ error && <div>Error!</div> }
-
-				{ !submitted ? (
-					<Card heading="Add New Password">
+				{ !this.state.formSubmitted ? (
+					<CardLayout heading='Add new password'>
 						<form onSubmit={this.handleSubmit}>
-							<TextInputField
-								name="name"
-								placeholder="Gmail"
-								desc="Name"
-								value={formFields.name.value} 
-								touched={formFields.name.touched}
-								valid={formFields.name.valid}
-								handleChange={this.handleInputChange} />
-							<TextInputField
-								name="username"
-								placeholder="example@gmail.com"
-								desc="Username or email address"
-								value={formFields.username.value}
-								touched={formFields.username.touched} 
-								valid={formFields.username.valid}
-								handleChange={this.handleInputChange} />
-							<TextInputField
-								name="password"
-								placeholder="Enter or create your password"
-								desc="Enter or create your password" 
-								value={formFields.password.value}
-								touched={formFields.password.touched}
-								valid={formFields.password.valid} 
-								handleChange={this.handleInputChange} />
+							<InputField {...name} />
+							<InputField {...username} />
+							<InputField {...password} />
+
 							<div className="FormOptions">
-								<GenereateNewPasswordBtn
-									onClick={this.togglePassGenerator} />
-								<input 
-									type="submit" 
-									value="Create" 
-									disabled={!isFormValid} />
+								{ ShowPasswordGeneratorButton }
+								{ SubmitButton }
 							</div>
 						</form>
+
 						<ReactCSSTransitionGroup
 							transitionName="pass-gen-transition"
 							transitionEnterTimeout={200}
 							transitionLeaveTimeout={300}>
-							{this.state.showPassGenerator && passGenerator}
+							{ this.state.showPasswordGenerator && PasswordGenerator }
 						</ReactCSSTransitionGroup>
-					</Card>
+					</CardLayout>
 				) : (
 					<SuccessfulSubmission
-						serviceName={formFields.name.value}
-						showForm={this.showAndResetForm} />
+							serviceName={name.value}
+							showForm={this.showAndResetForm} />
 				) }
 			</div>
 		);
