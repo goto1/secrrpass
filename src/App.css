@@ -18,3 +18,21 @@ body {
 	justify-content: center;
 	height: 100vh;
 }
+
+/**
+ * Transitions
+ */
+.pass-gen-transition-enter {
+	opacity: 0;
+}
+.pass-gen-transition-enter.pass-gen-transition-enter-active {
+	opacity: 1;
+	transition: opacity 200ms ease-in-out;
+}
+.pass-gen-transition-leave {
+	opacity: 1;
+}
+.pass-gen-transition-leave.pass-gen-transition-leave-active {
+	opacity: 0;
+	transition: all 300ms ease-in-out;
+}
