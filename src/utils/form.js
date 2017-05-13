@@ -1,7 +1,25 @@
+import React from 'react';
+import { SubmitButton, DefaultButton } from '../components/views/buttons';
 import * as _ from 'lodash';
 
+function genSubmitBtn(name, validForm) {
+	if (!name) { return null; }
+
+	const button = { attr: { disabled: !validForm }, name };
+
+	return <SubmitButton {...button} />;
+}
+
+function genDefaultBtn(name, action) {
+	if (!name || !action) { return null; }
+
+	const button = { attr: { onClick: action }, name };
+
+	return <DefaultButton {...button} />;
+}
+
 function formField(attributes, description) {
-	if (!attributes || !description) { return {}; }
+	if (!attributes || !description) { return; }
 
 	return {
 		attr: { value: '', ...attributes },
@@ -11,7 +29,7 @@ function formField(attributes, description) {
 	};
 }
 
-function updateFormField(event, formFields) {
+function updateFormFields(event, formFields) {
 	if (!event || !formFields) { return {}; }
 
 	const { name, value } = event.target;
@@ -30,6 +48,23 @@ function updateFormField(event, formFields) {
 	return updated;
 }
 
+function updateSliderValues(event, sliders) {
+	const { name, value } = event;
+	const updatedSlider = {...sliders[name], value};
+
+	return {...sliders, [name]: updatedSlider};
+}
+
+function getPasswordRecipe(sliders) {
+	const recipe = {};
+
+	_.forEach(sliders, (value, key) => {
+		recipe[key] = +value.value;
+	});
+
+	return recipe;
+}
+
 function checkIfValidForm(formFields) {
 	if (!formFields) { return false; }
 
@@ -45,9 +80,38 @@ function checkIfMatchingFields(field1, field2) {
 	return field1.value === field2.value;
 }
 
+function resetForm(form) {
+	if (!form) { return; }
+
+	const formCopy = Object.assign({}, form);
+
+	_.forEach(formCopy, (value, key) => {
+		if (key === 'formFields') {
+			const formFields = formCopy[key];
+
+			_.forEach(formFields, (value, key) => {
+				formFields[key].attr.value = '';
+				formFields[key].touched = false;
+				formFields[key].valid = false;
+			});
+
+			formCopy[key] = formFields;
+		} else {
+			formCopy[key] = false;
+		}
+	});
+
+	return formCopy;
+}
+
 export {
+	genSubmitBtn,
+	genDefaultBtn,
 	formField, 
-	updateFormField, 
+	updateFormFields, 
+	updateSliderValues,
 	checkIfValidForm, 
-	checkIfMatchingFields 
+	checkIfMatchingFields,
+	resetForm,
+	getPasswordRecipe
 };
