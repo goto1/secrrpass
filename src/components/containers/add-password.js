@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import firebase from '../../utils/firebase';
 import PasswordGeneratorForm from './password-generator-form';
-import InputField from '../views/input-field';
+import { InputField } from '../views/input-field';
 import CardLayout from '../layouts/card';
 import { 
 	genSubmitBtn,
@@ -11,13 +11,11 @@ import {
 	updateFormFields,
 	checkIfValidForm,
 	resetForm } from '../../utils/form';
-import './add-password.css';
 
 function SuccessfulSubmission({ serviceName, showForm }) {
 	const styles = {
 		container: {
 			textAlign: 'center',
-			padding: '10px',
 			marginTop: '25%',
 			padding: '20px',
 			fontWeight: '200',
@@ -63,7 +61,6 @@ class AddPasswordForm extends Component {
 					type: 'text',
 					name: 'name',
 					placeholder: 'Gmail',
-					value: 'Test',
 					onChange: this.handleChange.bind(this),
 				}, 'Name'),
 				username: formField({
@@ -84,10 +81,11 @@ class AddPasswordForm extends Component {
 			showPasswordGenerator: false,
 		};
 
-		this.togglePasswordGenerator = this.togglePasswordGenerator.bind(this);
-		this.onPasswordGenerated = this.onPasswordGenerated.bind(this);
-		this.handleSubmit = this.handleSubmit.bind(this),
+		this.getStyles = this.getStyles.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
 		this.showAndResetForm = this.showAndResetForm.bind(this);
+		this.onPasswordGenerated = this.onPasswordGenerated.bind(this);
+		this.togglePasswordGenerator = this.togglePasswordGenerator.bind(this);
 	}
 
 	handleChange(event) {
@@ -130,6 +128,16 @@ class AddPasswordForm extends Component {
 		this.setState({ ...resetForm(this.state) });
 	}
 
+	getStyles() {
+		return {
+			formOptions: {
+				display: 'flex',
+				justifyContent: 'space-between',
+				margin: '25px auto',
+			},
+		};
+	}
+
 	render() {
 		const { name, username, password } = this.state.formFields;
 		const PasswordGenerator = 
@@ -137,6 +145,7 @@ class AddPasswordForm extends Component {
 		const SubmitButton = genSubmitBtn('Submit', this.state.formValid);
 		const ShowPasswordGeneratorButton = 
 			genDefaultBtn('Password generator', this.togglePasswordGenerator);
+		const styles = this.getStyles();
 
 		return (
 			<div>
@@ -147,7 +156,7 @@ class AddPasswordForm extends Component {
 							<InputField {...username} />
 							<InputField {...password} />
 
-							<div className="FormOptions">
+							<div style={styles.formOptions}>
 								{ ShowPasswordGeneratorButton }
 								{ SubmitButton }
 							</div>
