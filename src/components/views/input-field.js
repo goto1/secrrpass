@@ -20,6 +20,16 @@ function InputField({ attr, desc, valid, touched }) {
 	);
 }
 
-export default InputField;
+function Slider(attributes) {
+	return (
+		<div className='slider'>
+			<div className='slider-name'>{attributes.name.toUpperCase()}</div>
+			<input type='range' {...attributes} />
+			<div className='slider-count'>{attributes.value}</div>
+		</div>
+	);
+}
+
+export { InputField, Slider };
 
 

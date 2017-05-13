@@ -1,3 +1,7 @@
+input:focus {
+	outline: none;
+}
+
 .InputField {
 	overflow: hidden;
 	margin-bottom: 25px;
@@ -33,4 +37,49 @@
 	color: #F3F3F5;
 	opacity: 0.65;
 	font-size: 15px;
+}
+
+.slider {
+	color: #202249;
+	text-align: center;
+}
+
+.slider input[type="range"] {
+	-webkit-appearance: none;
+	width: 90%;
+}
+
+.slider input[type="range"]::-webkit-slider-runnable-track {
+	width: 100%;
+	height: 6px;
+	cursor: pointer;
+	animate: 0.2s;
+	box-shadow: 1px 1px 1px #262856, 0px 0px 1px #161833;
+	background: #1F224A;
+	border-radius: 5px;
+}
+
+.slider input[type="range"]::-webkit-slider-thumb {
+	box-shadow: 1px 1px 1px #B1154A, 0px 0px 1px #710D2F;
+	height: 25px;
+	width: 8px;
+	border-radius: 3px;
+	background: #F11C64;
+	cursor: pointer;
+	-webkit-appearance: none;
+	margin-top: -9px;
+}
+
+.slider-name {
+	font-size: 15px;
+	letter-spacing: 1.25px;
+	font-weight: 400;
+	text-align: left;
+	margin-bottom: 2.5px;
+}
+
+.slider-count {
+	text-align: right;
+	font-size: 12.5px;
+	margin-top: 2.5px;
 }

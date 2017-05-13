@@ -24,11 +24,11 @@ button:disabled {
 .btn-default {
 	border: none;
 	background: inherit;
-	color: #EF5A40;
+	color: #F3F3F5;
 	letter-spacing: 1px;
 	border-bottom: 1px solid #EF5A40;
 	font-weight: 300;
 	font-size: 13px;
-	padding: 0 5px;
+	padding: 2.5px 5px;
 	text-transform: uppercase;
 }
