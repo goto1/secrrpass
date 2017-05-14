@@ -35,7 +35,7 @@ function getRandomNum() {
  * Password Generator Functions
  */
 
-function generatePasswordWith(recipe) {
+function generatePassword(recipe) {
 	const { length, digits, symbols } = recipe;
 	let password = '';
 
@@ -101,6 +101,6 @@ function generateRandomID() {
 }
 
 export { 
-	generatePasswordWith,
+	generatePassword,
 	generateRandomID 
 };
