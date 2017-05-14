@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import CardLayout from '../layouts/card';
-import InputField from '../views/input-field';
-import { formField, updateFormField } from '../../utils/form';
+import { InputField } from '../views/input-field';
+import { formField, updateFormFields } from '../../utils/form';
 
 class EditPassword extends Component {
 	constructor() {
@@ -29,14 +29,12 @@ class EditPassword extends Component {
 				}, 'Change your password'),
 			},
 		};
-
-		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
 	handleSubmit() { }
 
 	handleChange(event) {
-		const updatedFormFields = updateFormField(event, this.state.formFields);
+		const updatedFormFields = updateFormFields(event, this.state.formFields);
 
 		this.setState({ formFields: updatedFormFields });
 	}

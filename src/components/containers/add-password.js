@@ -81,7 +81,6 @@ class AddPasswordForm extends Component {
 			showPasswordGenerator: false,
 		};
 
-		this.getStyles = this.getStyles.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.showAndResetForm = this.showAndResetForm.bind(this);
 		this.onPasswordGenerated = this.onPasswordGenerated.bind(this);
