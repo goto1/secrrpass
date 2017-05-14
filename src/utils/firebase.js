@@ -1,9 +1,11 @@
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase';
 import secret from '../config/secret';
-import securityUtils from './security-utils';
+import { 
+	encrypt, decrypt,
+	generatePasswordHash } from './security';
 
-firebase.initializeApp(securityUtils.decrypt(secret.firebase));
+firebase.initializeApp(decrypt(secret.firebase));
 
 const getUserReference =
 	(userID) => firebase.database().ref(`/users/${userID}`);
@@ -86,7 +88,7 @@ const createNewPassword = (userID, passwordDetails) => {
 		createdAt: Date.now(),
 		updatedAt: Date.now(),
 	};
-	const passInfo = securityUtils.encrypt(newPass);
+	const passInfo = encrypt(newPass);
 
 	return Observable.fromPromise(passRef.set(passInfo));
 };
@@ -109,7 +111,7 @@ const editPassword = (userID, passwordID, updatedDetails) => {
 	updateUserLastAccess(userID).subscribe();
 
 	const passRef = getPassReference(userID, passwordID);
-	const encryptedPassInfo = securityUtils.encrypt(updatedDetails);
+	const encryptedPassInfo = encrypt(updatedDetails);
 
 	return Observable.fromPromise(passRef.update(encryptedPassInfo)).debounceTime(1000);
 };
@@ -142,7 +144,7 @@ const setMasterPassword = (userID, password) => {
 	}
 	updateUserLastAccess(userID).subscribe();
 
-	const hash = securityUtils.generatePasswordHash(password);
+	const hash = generatePasswordHash(password);
 	const masterPassRef = getMasterPassReference(userID);
 
 	return Observable.fromPromise(masterPassRef.set(hash));
