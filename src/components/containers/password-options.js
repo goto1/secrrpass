@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 function Spacer() {
@@ -33,7 +34,7 @@ function Option({ icon, onClick }) {
 	);
 }
 
-function ActionButton({ name, action, goBack}) {
+function ActionButton({ name, action, goBack }) {
 	const styles = {
 		container: {
 			background: '#F15B3F',
@@ -84,13 +85,28 @@ function ActionButton({ name, action, goBack}) {
 class PasswordOptions extends Component {
 	constructor(props) {
 		super(props);
+
 		this.state = {
-			showCopyBtn: false,
-			showDeleteBtn: false,
+			buttons: {
+				delete: {
+					name: 'Delete',
+					action: this.delete.bind(this),
+					goBack: this.showAllOptions.bind(this),
+				},
+				copy: {
+					name: 'Copy',
+					action: this.copy.bind(this),
+					goBack: this.showAllOptions.bind(this),
+				},
+			},
+			displayCopyBtn: false,
+			displayDeleteBtn: false,
+			displayEditForm: false,
 		};
-		this.onCopy = this.onCopy.bind(this);
-		this.onEdit = this.onEdit.bind(this);
-		this.onDelete = this.onDelete.bind(this);
+
+		this.copy = this.copy.bind(this);
+		this.edit = this.edit.bind(this);
+		this.delete = this.delete.bind(this);
 		this.showCopyBtn = this.showCopyBtn.bind(this);
 		this.showDeleteBtn = this.showDeleteBtn.bind(this);
 		this.showAllOptions = this.showAllOptions.bind(this);
@@ -98,76 +114,98 @@ class PasswordOptions extends Component {
 
 	showAllOptions() {
 		this.setState({
-			showCopyBtn: false,
-			showDeleteBtn: false,
+			displayCopyBtn: false,
+			displayDeleteBtn: false,
 		});
 	}
 
 	showCopyBtn() {
 		this.setState({ 
-			showCopyBtn: !this.state.showCopyBtn, 
-			showDeleteBtn: false 
+			displayCopyBtn: !this.state.showCopyBtn, 
+			displayDeleteBtn: false 
 		});
 	}
 
 	showDeleteBtn() {
 		this.setState({
-			showCopyBtn: false,
-			showDeleteBtn: !this.state.showDeleteBtn,
+			displayCopyBtn: false,
+			displayDeleteBtn: !this.state.showDeleteBtn,
 		});
 	}
 
-	onCopy() {
+	copy() {
 		const { id } = this.props;
-		console.log(`password (${id}) copy action`);
+		console.log(`password with id of ${id} was copied...`);
 	}
 
-	onEdit() {
-		const { id } = this.props;
-
-		console.log(`password (${id}) edit action`);
+	edit() {
+		this.setState({ displayEditForm: true });
 	}
 
-	onDelete() {
+	delete() {
 		const { id, deletePassword } = this.props;
 
 		deletePassword(id);
 	}
 
-	render() {
-		const buttons = {
-			delete: {
-				name: 'Delete',
-				action: this.onDelete,
-				goBack: this.showAllOptions,
+	getStyles() {
+		return {
+			container: {
+				position: 'absolute',
+				top: '16px',
+				marginLeft: '12.5px',
 			},
-			copy: {
-				name: 'Copy',
-				action: this.onCopy,
-				goBack: this.showAllOptions,
+			options: {
+				background: '#96B81C',
+				width: '157.5px',
+				height: '52.5px',
+				borderRadius: '500px',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
 			},
 		};
+	}
+
+	render() {
+		const styles = this.getStyles();
+		const showCopyBtn = this.showCopyBtn;
+		const showDeleteBtn = this.showDeleteBtn;
+		const edit = this.edit;
+		const passwordID = this.props.id;
+		const { 
+			displayDeleteBtn, displayCopyBtn, 
+			displayEditForm, buttons } = this.state;
+
+		if (displayEditForm) {
+			const url = `/edit/${passwordID}`;
+
+			return <Redirect to={url} />;
+		}
 
 		return (
-			<div className="Options">
-				<div className="PasswordOptions">
-					<Option icon="clipboard" onClick={this.showCopyBtn} />
+			<div style={styles.container}>
+				<div style={styles.options}>
+					<Option icon='clipboard' onClick={showCopyBtn} />
 					<Spacer />
-					<Option icon="pencil" onClick={this.onEdit} />
+					<Option icon='pencil' onClick={edit} />
 					<Spacer />
-					<Option icon="trash-o" onClick={this.showDeleteBtn} />
+					<Option icon='trash-o' onClick={showDeleteBtn} />
 				</div>
+
 				<ReactCSSTransitionGroup
-					transitionName="action-btn"
+					transitionName='action-btn'
 					transitionEnterTimeout={300}
 					transitionLeaveTimeout={300}>
-					{this.state.showCopyBtn && <ActionButton key={'1'} {...buttons.copy} />}
+						{	displayCopyBtn &&
+							<ActionButton key={'1'} {...buttons.copy} /> }
 				</ReactCSSTransitionGroup>
 				<ReactCSSTransitionGroup
-					transitionName="action-btn"
+					transitionName='action-btn'
 					transitionEnterTimeout={300}
 					transitionLeaveTimeout={300}>
-					{this.state.showDeleteBtn && <ActionButton key={'2'} {...buttons.delete} />}
+						{	displayDeleteBtn &&
+							<ActionButton key={'2'} {...buttons.delete} /> }
 				</ReactCSSTransitionGroup>
 			</div>
 		);
