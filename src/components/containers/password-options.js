@@ -1,37 +1,85 @@
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-import './password-options.css';
 
-const Spacer = () => (
-	<span className="Spacer">|</span>
-);
+function Spacer() {
+	const styles = {
+		margin: '0 10px',
+		fontSize: '40px',
+		color: '#779902',
+	};
 
-const Option = ({ icon, onClick }) => {
+	return (
+		<span style={styles}>|</span>
+	);
+}
+
+function Option({ icon, onClick }) {
+	const styles = {
+		display: 'block',
+		fontSize: '22.5px',
+		color: '#CAFE00',
+		cursor: 'pointer',
+	};
 	const iconType = `fa fa-${icon}`;
-	return (
-		<div className="Option">
-			<i 
-				className={iconType} 
-				aria-hidden="true"
-				onClick={onClick} />
-		</div>
-	);
-};
 
-const ActionButton = (props) => {
-	const { name, action, goBack } = props;
 	return (
-		<div className="ActionButton">
-			<div>
-				<i
-					className="fa fa-chevron-left"
-					aria-hidden="true"
-					onClick={goBack} />
-			</div>
-			<div onClick={action}>{name}</div>
+		<div style={styles}>
+			<i 
+				className={iconType}
+				aria-hidden='true'
+				onClick={onClick} 
+			/>
 		</div>
 	);
-};
+}
+
+function ActionButton({ name, action, goBack}) {
+	const styles = {
+		container: {
+			background: '#F15B3F',
+			color: '#F3F3F5',
+			width: '100%',
+			height: '52.5px',
+			display: 'flex',
+			alignItems: 'center',
+			borderRadius: '500px',
+			position: 'absolute',
+			top: '0',
+			fontSize: '20px',
+			textTransform: 'uppercase',
+			justifyContent: 'center',
+			zIndex: '1',
+		},
+		icon: {
+			cursor: 'pointer',
+			flexBasis: '15%',
+			textAlign: 'center',
+		},
+		action: {
+			cursor: 'pointer',
+			flexBasis: '65%',
+			overflow: 'hidden',
+			textAlign: 'center',
+		},
+	};
+
+	return (
+		<div style={styles.container}>
+			<div style={styles.icon}>
+				<i
+					className='fa fa-chevron-left'
+					aria-hidden='true'
+					onClick={goBack} 
+				/>
+			</div>
+			<div 
+				style={styles.action} 
+				onClick={action}>
+					{name}
+			</div>
+		</div>
+	);
+}
 
 class PasswordOptions extends Component {
 	constructor(props) {
