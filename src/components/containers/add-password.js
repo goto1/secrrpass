@@ -3,6 +3,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import firebase from '../../utils/firebase';
 import PasswordGeneratorForm from './password-generator-form';
 import { InputField } from '../views/input-field';
+import SuccessfulSubmission from '../views/successful-submission';
 import CardLayout from '../layouts/card';
 import { 
 	genSubmitBtn,
@@ -11,45 +12,6 @@ import {
 	updateFormFields,
 	checkIfValidForm,
 	resetForm } from '../../utils/form';
-
-function SuccessfulSubmission({ serviceName, showForm }) {
-	const styles = {
-		container: {
-			textAlign: 'center',
-			marginTop: '25%',
-			padding: '20px',
-			fontWeight: '200',
-			letterSpacing: '2px',
-			lineHeight: '35px',
-		},
-		message: {
-			margin: '30px 0',
-			fontSize: '22.5px',
-			textTransform: 'uppercase',
-			color: '#F3F3F5',
-		},
-		span: { color: '#EF5A40' },
-		button: {
-			display: 'flex',
-			justifyContent: 'space-between',
-			margin: '25px auto',
-		},
-	};
-	const backButton = genDefaultBtn('Add another password', showForm);
-
-	return (
-		<div style={styles.container}>
-			<div style={styles.message}>
-				<div>
-					Your <span style={styles.span}>{serviceName}</span> password was created!
-				</div>
-			</div>
-			<div style={styles.message}>
-				{ backButton }
-			</div>
-		</div>
-	);
-}
 
 class AddPasswordForm extends Component {
 	constructor() {
@@ -146,33 +108,43 @@ class AddPasswordForm extends Component {
 			genDefaultBtn('Password generator', this.togglePasswordGenerator);
 		const styles = this.getStyles();
 
+		if (this.state.formSubmitted) {
+			const serviceName = <span style={{ color: '#EF5A40' }}>{name.attr.value}</span>;
+			const message = <div>Your password {serviceName} was created!</div>;
+			const showAndResetForm = this.showAndResetForm;
+
+			return (
+				<div>
+					<SuccessfulSubmission
+						message={message}
+						actionName='Add another password'
+						action={showAndResetForm} 
+					/>
+				</div>
+			);
+		}
+
 		return (
 			<div>
-				{ !this.state.formSubmitted ? (
-					<CardLayout heading='Add new password'>
-						<form onSubmit={this.handleSubmit}>
-							<InputField {...name} />
-							<InputField {...username} />
-							<InputField {...password} />
+				<CardLayout heading='Add new password'>
+					<form onSubmit={this.handleSubmit}>
+						<InputField {...name} />
+						<InputField {...username} />
+						<InputField {...password} />
 
-							<div style={styles.formOptions}>
-								{ ShowPasswordGeneratorButton }
-								{ SubmitButton }
-							</div>
-						</form>
+						<div style={styles.formOptions}>
+							{ ShowPasswordGeneratorButton }
+							{ SubmitButton }
+						</div>
+					</form>
 
-						<ReactCSSTransitionGroup
-							transitionName="pass-gen-transition"
-							transitionEnterTimeout={200}
-							transitionLeaveTimeout={300}>
-							{ this.state.showPasswordGenerator && PasswordGenerator }
-						</ReactCSSTransitionGroup>
-					</CardLayout>
-				) : (
-					<SuccessfulSubmission
-							serviceName={name.attr.value}
-							showForm={this.showAndResetForm} />
-				) }
+					<ReactCSSTransitionGroup
+						transitionName="pass-gen-transition"
+						transitionEnterTimeout={200}
+						transitionLeaveTimeout={300}>
+						{ this.state.showPasswordGenerator && PasswordGenerator }
+					</ReactCSSTransitionGroup>
+				</CardLayout>
 			</div>
 		);
 	}
