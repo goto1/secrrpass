@@ -38,15 +38,3 @@ function SuccessfulSubmission({ message, actionName, action }) {
 }
 
 export default SuccessfulSubmission;
-
-// const success = 
-// 	<SuccessfulSubmission
-// 		text='Your password was created!'
-// 		actionName='Add another password'
-// 		action={showForm} />;
-
-// const success = 
-// 	<SuccessfulSubmission
-// 		text='Your password was successfully updated!'
-// 		actionName='Home'
-// 		action={goHome} />;
