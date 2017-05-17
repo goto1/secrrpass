@@ -1,23 +1,78 @@
 import React from 'react';
 import './buttons.css';
 
-function SubmitButton({ attr, name }) {
+class ButtonBuilder {
+	constructor() {
+		this.state = { attributes: {} };
+
+		this.render = this.render.bind(this);
+		this.setName = this.setName.bind(this);
+		this.setType = this.setType.bind(this);
+		this.setAction = this.setAction.bind(this);
+		this.setDisabled = this.setDisabled.bind(this);
+		this.updateClassName = this.updateClassName.bind(this);
+	}
+
+	setName(name) {
+		if (typeof name !== 'string') { return; }
+
+		this.state['name'] = name;
+
+		return this;
+	}
+
+	setType(type) {
+		if (typeof type !== 'string') { return; }
+
+		this.state.attributes['type'] = type;
+
+		return this;
+	}
+
+	setAction(action) {
+		if (typeof action !== 'function') { return; }
+
+		this.state.attributes['onClick'] = action;
+
+		return this;
+	}
+
+	setDisabled(disabled) {
+		if (typeof disabled !== 'boolean') { return; }
+
+		this.state.attributes['disabled'] = disabled;
+
+		return this;
+	}
+
+	updateClassName() {
+		const type = this.state.attributes.type;
+
+		switch (type) {
+			case 'submit':
+				this.state.attributes['className'] = 'btn-submit';
+				break;
+			default:
+				this.state.attributes['className'] = 'btn-default';
+		}
+	}
+
+	render() {
+		this.updateClassName();
+
+		const { attributes, name } = this.state;
+
+		return <ButtonComponent attributes={attributes} name={name} />;
+	}
+}
+
+function ButtonComponent({ attributes, name }) {
 	return (
-		<button className='btn-submit' type='submit' {...attr}>
+		<button {...attributes}>
 			{name}
 		</button>
 	);
 }
 
-function DefaultButton({ name, attr }) {
-	return (
-		<button className='btn-default' type='button' {...attr}>
-			{name}
-		</button>
-	);
-}
 
-export {
-	SubmitButton,
-	DefaultButton,
-};
+export default ButtonBuilder;
