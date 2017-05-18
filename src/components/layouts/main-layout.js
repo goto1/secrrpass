@@ -3,7 +3,8 @@ import { Route, Switch } from 'react-router-dom';
 import Header from '../containers/header';
 import PasswordList from '../containers/password-list';
 import AddPassword from '../containers/add-password';
-import Settings from '../settings';
+import EditPassword from '../containers/edit-password';
+import Settings from '../containers/settings';
 
 const styles = {
 	layout: {
@@ -31,6 +32,7 @@ const MainLayout = () => (
 				<Route exact path="/" component={PasswordList} />
 				<Route path="/add" component={AddPassword} />
 				<Route path="/settings" component={Settings} />
+				<Route path="/edit/:passwordID" component={EditPassword} />
 				<Route path="/:userID" component={PasswordList} />
 			</Switch>
 		</div>
