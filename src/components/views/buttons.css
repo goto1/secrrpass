@@ -21,6 +21,16 @@ button:disabled {
 	text-transform: uppercase;
 }
 
+.btn-submit-settings {
+	font-size: 15px;
+	background: inherit;
+	border: 2px solid #EF5A40;
+	color: #EF5A40;
+	font-weight: 200;
+	padding: 5px 15px;
+	text-transform: uppercase;
+}
+
 .btn-default {
 	border: none;
 	background: inherit;

@@ -24,7 +24,12 @@ class ButtonBuilder {
 	setType(type) {
 		if (typeof type !== 'string') { return; }
 
-		this.state.attributes['type'] = type;
+		if (type.includes('submit') && type.length > 6) {
+			this.state.attributes['type'] = 'submit';
+			this.state.attributes['className'] = 'btn-submit-settings';
+		} else {
+			this.state.attributes['type'] = type;
+		}
 
 		return this;
 	}
@@ -48,12 +53,14 @@ class ButtonBuilder {
 	updateClassName() {
 		const type = this.state.attributes.type;
 
-		switch (type) {
-			case 'submit':
-				this.state.attributes['className'] = 'btn-submit';
-				break;
-			default:
-				this.state.attributes['className'] = 'btn-default';
+		if (this.state.attributes['className'] === undefined) {
+			switch (type) {
+				case 'submit':
+					this.state.attributes['className'] = 'btn-submit';
+					break;
+				default:
+					this.state.attributes['className'] = 'btn-default';
+			}
 		}
 	}
 
@@ -73,6 +80,5 @@ function ButtonComponent({ attributes, name }) {
 		</button>
 	);
 }
-
 
 export default ButtonBuilder;
