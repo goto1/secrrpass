@@ -1,0 +1,7 @@
+input[type='text']::placeholder {
+	text-transform: uppercase;
+	letter-spacing: 1.25px;
+	color: #1F224A;
+	opacity: .7;
+	font-size: 15px;
+}
