@@ -5,6 +5,28 @@ import ButtonBuilder from '../views/buttons';
 import { updateFormFields, checkIfValidForm } from '../../utils/form';
 import './settings.css';
 
+function generateFormFieldAttributes({ name, placeholder, onChange }) {
+	return {
+		attr: {
+			type: 'text',
+			name: name,
+			placeholder: placeholder,
+			onChange: onChange,
+		},
+		touched: false,
+		valid: false,
+	}
+}
+
+function generateFormAttributes(formFields) {
+	return {
+		formFields: formFields,
+		formSubmitted: false,
+		formValid: false,
+		showForm: false,
+	};
+}
+
 function Heading({ title, showForm, toggleFormAction }) {
 	const styles = {
 		container: {
@@ -106,33 +128,18 @@ class SetMasterPassword extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			formFields: {
-				masterPassword: {
-					attr: {
-						type: 'text',
-						name: 'masterPassword',
-						placeholder: 'Master Password',
-						onChange: this.handleChange.bind(this),
-					},
-					touched: false,
-					valid: false,
-				},
-				masterPasswordRepeated: {
-					attr: {
-						type: 'text',
-						name: 'masterPasswordRepeated',
-						placeholder: 'Repeat Password',
-						onChange: this.handleChange.bind(this),
-					},
-					touched: false,
-					valid: false,
-				},
-			},
-			formSubmitted: false,
-			formValid: false,
-			showForm: false,
-		};
+		this.state = generateFormAttributes({
+			masterPassword: generateFormFieldAttributes({
+				name: 'masterPassword',
+				placeholder: 'Master Password',
+				onChange: this.handleChange.bind(this),
+			}),
+			masterPasswordRepeated: generateFormFieldAttributes({
+				name: 'masterPasswordRepeated',
+				placeholder: 'Repeat Password',
+				onChange: this.handleChange.bind(this),
+			}),
+		});
 
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.toggleForm = this.toggleForm.bind(this);
