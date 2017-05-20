@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import Card from '../layouts/card';
 import ButtonBuilder from '../views/buttons';
+import SuccessfulSubmission from '../views/successful-submission';
+import API from '../../utils/api';
+import ErrorHandler from '../../utils/error-handler';
 import { updateFormFields, checkIfValidForm } from '../../utils/form';
 import './settings.css';
 
@@ -128,6 +131,8 @@ class SetMasterPassword extends Component {
 	constructor(props) {
 		super(props);
 
+		console.log(props);
+
 		this.state = generateFormAttributes({
 			masterPassword: generateFormFieldAttributes({
 				name: 'masterPassword',
@@ -145,8 +150,23 @@ class SetMasterPassword extends Component {
 		this.toggleForm = this.toggleForm.bind(this);
 	}
 
+	componentWillUnmount() {
+		if (this.formSubmitted) {
+			this.setMasterPassword.unsubscribe();
+		}
+	}
+
 	handleSubmit(event) {
 		event.preventDefault();
+		const userID = localStorage.getItem('userID');
+		const password = this.state.formFields.masterPassword.attr.value;
+
+		this.setMasterPassword = 
+			API.setMasterPassword(userID, password)
+				.subscribe(
+					(res) => { this.setState({ formSubmitted: true }); },
+					(err) => { ErrorHandler.log(err); }
+				);
 	}
 
 	handleChange(event) {
@@ -161,7 +181,7 @@ class SetMasterPassword extends Component {
 	}
 
 	render() {
-		const { formValid, showForm, formFields } = this.state;
+		const { formValid, showForm, formFields, formSubmitted } = this.state;
 		const { handleSubmit, toggleForm } = this;
 		const formAttributes = {
 			title: 'Set Master Password',
@@ -175,6 +195,19 @@ class SetMasterPassword extends Component {
 										.setDisabled(!formValid)
 										.render();
 
+		if (formSubmitted) {
+			const message = 'Your master password was set!';
+			const goHome = () => this.props.history.push(`/${localStorage.getItem('userID')}`);
+
+			return (
+				<SuccessfulSubmission
+					message={message}
+					actionName='Home'
+					action={goHome} 
+				/>
+			);
+		}
+
 		return (
 			<Form formAttributes={formAttributes}>
 				<InputField {...formFields.masterPassword} />
@@ -185,10 +218,10 @@ class SetMasterPassword extends Component {
 	}
 }
 
-function Settings() {
+function Settings(props) {
 	return (
 		<Card heading='Settings'>
-			<SetMasterPassword />
+			<SetMasterPassword {...props} />
 		</Card>
 	);
 }
