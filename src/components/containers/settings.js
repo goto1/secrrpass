@@ -8,6 +8,19 @@ import ErrorHandler from '../../utils/error-handler';
 import { updateFormFields, checkIfValidForm } from '../../utils/form';
 import './settings.css';
 
+function genSuccSubmissionMessage({ message, push }) {
+	const userID = localStorage.getItem('userID');
+	const action = () => push(`/${userID}`);
+
+	return (
+		<SuccessfulSubmission
+			message={message}
+			actionName='Home'
+			action={action} 
+		/>
+	);
+}
+
 function generateFormFieldAttributes({ name, placeholder, onChange }) {
 	return {
 		attr: {
@@ -131,8 +144,6 @@ class SetMasterPassword extends Component {
 	constructor(props) {
 		super(props);
 
-		console.log(props);
-
 		this.state = generateFormAttributes({
 			masterPassword: generateFormFieldAttributes({
 				name: 'masterPassword',
@@ -196,16 +207,12 @@ class SetMasterPassword extends Component {
 										.render();
 
 		if (formSubmitted) {
-			const message = 'Your master password was set!';
-			const goHome = () => this.props.history.push(`/${localStorage.getItem('userID')}`);
+			const success = genSuccSubmissionMessage({
+				message: 'Your master password was set!',
+				push: this.props.history.push,
+			});
 
-			return (
-				<SuccessfulSubmission
-					message={message}
-					actionName='Home'
-					action={goHome} 
-				/>
-			);
+			return success;
 		}
 
 		return (
@@ -218,10 +225,91 @@ class SetMasterPassword extends Component {
 	}
 }
 
+class ChangeMasterPassword extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = generateFormAttributes({
+			currentPassword: generateFormFieldAttributes({
+				name: 'currentPassword',
+				placeholder: 'Current Password',
+				onChange: this.handleChange.bind(this),
+			}),
+			newMasterPassword: generateFormFieldAttributes({
+				name: 'newMasterPassword',
+				placeholder: 'New Password',
+				onChange: this.handleChange.bind(this),
+			}),
+			newMasterPasswordRepeated: generateFormFieldAttributes({
+				name: 'newMasterPasswordRepeated',
+				placeholder: 'Repeat Password',
+				onChange: this.handleChange.bind(this),
+			}),
+		});
+
+		this.handleSubmit = this.handleSubmit.bind(this);
+		this.toggleForm = this.toggleForm.bind(this);
+	}
+
+	componentWillUnmount() {
+		// TODO: unsubscribe from any observers
+	}
+
+	handleSubmit(event) {
+		event.preventDefault();
+	}
+
+	handleChange(event) {
+		const formFields = updateFormFields(event, this.state.formFields);
+		const formValid = checkIfValidForm(formFields);
+
+		this.setState({ formFields, formValid });
+	}
+
+	toggleForm() {
+		this.setState({ showForm: !this.state.showForm });
+	}
+
+	render() {
+		const { formValid, showForm, formFields, formSubmitted } = this.state;
+		const { handleSubmit, toggleForm } = this;
+		const formAttributes = {
+			title: 'Change Master Password',
+			showForm: showForm,
+			toggleForm: toggleForm,
+			handleSubmit: handleSubmit,
+		};
+		const SubmitBtn = new ButtonBuilder()
+												.setType('submit-settings')
+												.setName('Submit')
+												.setDisabled(!formValid)
+												.render();
+
+		if (formSubmitted) {
+			const success = genSuccSubmissionMessage({
+				message: 'Your master password was changed!',
+				push: this.props.history.push,
+			});
+
+			return success;
+		}
+
+		return (
+			<Form formAttributes={formAttributes}>
+				<InputField {...formFields.currentPassword} />
+				<InputField {...formFields.newMasterPassword} />
+				<InputField {...formFields.newMasterPasswordRepeated} />
+				{ SubmitBtn }
+			</Form>
+		);
+	}
+}
+
 function Settings(props) {
 	return (
 		<Card heading='Settings'>
 			<SetMasterPassword {...props} />
+			<ChangeMasterPassword {...props} />
 		</Card>
 	);
 }
