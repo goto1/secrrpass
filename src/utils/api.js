@@ -1,10 +1,10 @@
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase';
-// import secret from '../config/secret';
-import { handleError } from './error-handler';
-import {
-	encrypt, decrypt, generatePasswordHash } from './security';
-
+import ErrorHandler from './error-handler';
+import { extractData } from './response-handler';
+import { 
+	encrypt, decrypt, 
+	generatePasswordHash, compareHashToPassword } from './security';
 
 /**
  * User Functions
@@ -22,7 +22,7 @@ function checkIfValidUserID(userID) {
 
 function updateUserLastAccess(userID) {
 	if (!checkIfValidUserID(userID)) {
-		handleError('Invalid UserID for action updateUserLastAccess');
+		ErrorHandler.log('Invalid UserID for action updateUserLastAccess');
 		return Observable.throw(new Error('Invalid UserID'));
 	}
 
@@ -38,9 +38,13 @@ function getPasswordReference(userID, passwordID) {
 	return firebase.database().ref(`/users/${userID}/passwords/${passwordID}`);
 }
 
+function getMasterPasswordReference(userID) {
+	return firebase.database().ref(`/users/${userID}/masterPassword`);
+}
+
 function getPasswordDetails(userID, passwordID) {
 	if (!userID || !passwordID) {
-		handleError('Invalid UserID for action getPasswordDetails');
+		ErrorHandler.log('Invalid UserID for action getPasswordDetails');
 		return Observable.throw(new Error('Invalid UserID'));
 	}
 	updateUserLastAccess(userID);
@@ -52,8 +56,10 @@ function getPasswordDetails(userID, passwordID) {
 
 function updatePassword(userID, updatedPassword) {
 	if (!checkIfValidUserID(userID) || !updatedPassword) {
-		handleError('Invalid UserID and/or Missing Password Details');
-		return Observable.throw('Invalid UserID and/or Missing Password Details');
+		const err = new Error(`Invalid UserID and/or Missing Password`);
+
+		ErrorHandler.log(err);
+		return Observable.throw(err);
 	}
 	updateUserLastAccess(userID);
 
@@ -73,7 +79,39 @@ function updatePassword(userID, updatedPassword) {
 	return Observable.fromPromise(passRef.set(encrypted));
 }
 
-export {
+function setMasterPassword(userID, password) {
+	if (!checkIfValidUserID(userID) || !password) {
+		const err = new Error(`Invalid UserID and/or Missing Password`);
+
+		ErrorHandler.log(err);
+		return Observable.throw(err);
+	}
+	updateUserLastAccess(userID);
+
+	const hash = generatePasswordHash(password);
+	const masterPasswordReference = getMasterPasswordReference(userID);
+
+	return Observable.fromPromise(masterPasswordReference.set(hash));
+}
+
+function checkIfMasterPasswordIsCorrect(userID, password) {
+	if (!checkIfValidUserID(userID) || !password) {
+		const err = new Error(`Invalid UserID and/or Missing Password`);
+
+		ErrorHandler.log(err);
+		return Observable.throw(err);
+	}
+
+	const mPassRef = getMasterPasswordReference(userID);
+
+	return Observable.fromPromise(mPassRef.once('value'))
+						.map(extractData)
+						.map(hash => compareHashToPassword(password, hash))
+}
+
+export default {
 	getPasswordDetails,
 	updatePassword,
+	setMasterPassword,
+	checkIfMasterPasswordIsCorrect,
 };
