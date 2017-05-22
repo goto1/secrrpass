@@ -1,25 +1,7 @@
-import React from 'react';
-import { SubmitButton, DefaultButton } from '../components/views/buttons';
 import * as _ from 'lodash';
 
-function genSubmitBtn(name, validForm) {
-	if (!name) { return null; }
-
-	const button = { attr: { disabled: !validForm }, name };
-
-	return <SubmitButton {...button} />;
-}
-
-function genDefaultBtn(name, action) {
-	if (!name || !action) { return null; }
-
-	const button = { attr: { onClick: action }, name };
-
-	return <DefaultButton {...button} />;
-}
-
 function formField(attributes, description) {
-	if (!attributes || !description) { return; }
+	if (!attributes || !description) { return null; }
 
 	return {
 		attr: { value: '', ...attributes },
@@ -105,8 +87,6 @@ function resetForm(form) {
 }
 
 export {
-	genSubmitBtn,
-	genDefaultBtn,
 	formField, 
 	updateFormFields, 
 	updateSliderValues,
