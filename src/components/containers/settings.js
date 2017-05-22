@@ -326,11 +326,101 @@ class ChangeMasterPassword extends Component {
 	}
 }
 
+class DeleteAccount extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = generateFormAttributes({
+			currentPassword: generateFormFieldAttributes({
+				name: 'currentPassword',
+				placeholder: 'Current Password',
+				onChange: this.handleChange.bind(this),
+			}),
+		});
+
+		this.handleSubmit = this.handleSubmit.bind(this);
+		this.toggleForm = this.toggleForm.bind(this);
+	}
+
+	componentWillUnmount() {
+		if (this.state.formSubmitted) {
+			this.deleteAccount.unsubscribe();
+		}
+	}
+
+	handleSubmit(event) {
+		event.preventDefault();
+
+		const userID = localStorage.getItem('userID');
+		const currentPassword = this.state.formFields.currentPassword.attr.value;
+
+		this.deleteAccount = 
+			API.checkIfMasterPasswordIsCorrect(userID, currentPassword)
+				.subscribe(
+					(match) => {
+						if (match !== false) {
+							API.deleteUserAccount(userID).subscribe(
+								() => { 
+									this.setState({ formSubmitted: true }); 
+									localStorage.removeItem('userID');
+								},
+							);
+						}
+					}
+				);
+	}
+
+	handleChange(event) {
+		const formFields = updateFormFields(event, this.state.formFields);
+		const formValid = checkIfValidForm(formFields);
+
+		this.setState({ formFields, formValid });
+	}
+
+	toggleForm() {
+		this.setState({ showForm: !this.state.showForm });
+	}
+
+	render() {
+		const { formValid, showForm, formFields, formSubmitted } = this.state;
+		const { handleSubmit, toggleForm } = this;
+		const formAttributes = {
+			title: 'Delete Account',
+			showForm: showForm,
+			toggleForm: toggleForm,
+			handleSubmit: handleSubmit,
+		};
+
+		const SubmitBtn = new ButtonBuilder()
+												.setType('submit-settings')
+												.setName('Delete')
+												.setDisabled(!formValid)
+												.render();
+
+		if (formSubmitted) {
+			const success = genSuccSubmissionMessage({
+				message: 'Your account was deleted!',
+				push: this.props.history.push,
+			});
+
+			return success;
+		}
+
+		return (
+			<Form formAttributes={formAttributes}>
+				<InputField {...formFields.currentPassword} />
+				{ SubmitBtn }
+			</Form>
+		);
+	}
+}
+
 function Settings(props) {
 	return (
 		<Card heading='Settings'>
 			<SetMasterPassword {...props} />
 			<ChangeMasterPassword {...props} />
+			<DeleteAccount {...props} />
 		</Card>
 	);
 }
