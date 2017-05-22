@@ -5,7 +5,7 @@ import ButtonBuilder from '../views/buttons';
 import SuccessfulSubmission from '../views/successful-submission';
 import API from '../../utils/api';
 import ErrorHandler from '../../utils/error-handler';
-import { updateFormFields, checkIfValidForm } from '../../utils/form';
+import { updateFormFields, checkIfValidForm, checkIfMatchingFields } from '../../utils/form';
 import './settings.css';
 
 function genSuccSubmissionMessage({ message, push }) {
@@ -252,16 +252,37 @@ class ChangeMasterPassword extends Component {
 	}
 
 	componentWillUnmount() {
-		// TODO: unsubscribe from any observers
+		if (this.state.formSubmitted) {
+			this.updateMasterPassword.unsubscribe();
+		}
 	}
 
 	handleSubmit(event) {
 		event.preventDefault();
+
+		const userID = localStorage.getItem('userID');
+		const { currentPassword, newMasterPassword } = this.state.formFields;
+
+		this.updateMasterPassword =
+			API.checkIfMasterPasswordIsCorrect(userID, currentPassword.attr.value)
+				.subscribe(
+					(match) => {
+						if (match !== false) {
+							API.setMasterPassword(userID, newMasterPassword.attr.value)
+								.subscribe(
+									() => { this.setState({ formSubmitted: true }); }	
+								);
+						}
+					}
+				);
 	}
 
 	handleChange(event) {
 		const formFields = updateFormFields(event, this.state.formFields);
-		const formValid = checkIfValidForm(formFields);
+		const mPass = formFields.newMasterPassword.attr;
+		const mPassRepeated = formFields.newMasterPasswordRepeated.attr;
+		const formValid = 
+			checkIfValidForm(formFields) && checkIfMatchingFields(mPass, mPassRepeated);
 
 		this.setState({ formFields, formValid });
 	}
