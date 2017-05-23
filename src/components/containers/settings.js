@@ -10,7 +10,13 @@ import './settings.css';
 
 function genSuccSubmissionMessage({ message, push }) {
 	const userID = localStorage.getItem('userID');
-	const action = () => push(`/${userID}`);
+	let action = null;
+	
+	if (userID) {
+		action = () => push(`/${userID}`);
+	} else {
+		action = () => push(`/`);
+	}
 
 	return (
 		<SuccessfulSubmission
@@ -416,6 +422,7 @@ class DeleteAccount extends Component {
 }
 
 function Settings(props) {
+	// TODO: show appropriate options for logged in users
 	return (
 		<Card heading='Settings'>
 			<SetMasterPassword {...props} />
