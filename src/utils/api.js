@@ -9,6 +9,7 @@ import {
 /**
  * User Functions
  */
+
 function getUserReference(userID) {
 	return firebase.database().ref(`/users/${userID}`);
 }
@@ -31,9 +32,22 @@ function updateUserLastAccess(userID) {
 	return Observable.fromPromise(lsRef.set(Date.now()));
 }
 
+function deleteUser(userID) {
+	if (!checkIfValidUserID(userID)) {
+		const err = new Error('Invalid UserID');
+		ErrorHandler.log(err);
+		return Observable.throw(err);
+	}
+
+	const userRef = getUserReference(userID);
+
+	return Observable.fromPromise(userRef.remove());
+}
+
 /**
  * Password Functions
  */
+
 function getPasswordReference(userID, passwordID) {
 	return firebase.database().ref(`/users/${userID}/passwords/${passwordID}`);
 }
@@ -109,7 +123,21 @@ function checkIfMasterPasswordIsCorrect(userID, password) {
 						.map(hash => compareHashToPassword(password, hash))
 }
 
+/**
+ * Error Logging
+ */
+
+function logError(err) {
+	if (!err) { return; }
+
+	const errRef = firebase.database().ref('errors');
+	const newErrRef = errRef.push();
+
+	newErrRef.set({ ...err });
+}
+
 export default {
+	deleteUser,
 	getPasswordDetails,
 	updatePassword,
 	setMasterPassword,
