@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router';
-import { forIn, remove } from 'lodash';
+import { forIn } from 'lodash';
 import PasswordItem from '../containers/password-item';
 import Loader from '../views/loader';
 import firebase from '../../utils/firebase';
+import API from '../../utils/api';
 import { generateRandomID } from '../../utils/generators';
-import { handleError } from '../../utils/error-handler';
+import ErrorHandler from '../../utils/error-handler';
+import UserUtils from '../../utils/user';
 import { extractData, decryptUserPasswords } from '../../utils/response-handler';
 
 function NoPasswords() {
@@ -39,9 +41,6 @@ function NoPasswords() {
 			<div style={styles.text}>
 				Currently you do not have any saved passwords.
 			</div>
-			<div style={styles.text}>
-				Go ahead and add a few passwords for future reference!
-			</div>
 		</div>
 	);
 }
@@ -52,7 +51,6 @@ class PasswordList extends Component {
 		this.state = {
 			showLoader: true,
 			passwords: null,
-			newUser: false,
 		};
 		this.deletePassword = this.deletePassword.bind(this);
 		this.getListOfPasswords = this.getListOfPasswords.bind(this);
@@ -64,19 +62,25 @@ class PasswordList extends Component {
 
 		localStorage.setItem('userID', userID);
 
-		firebase.checkIfUserExists(userID)
-			.map(extractData)
+		API.checkIfUserExists(userID)
 			.subscribe(
 				(user) => {
-					if (!user) {
-						firebase.createNewUser(userID).subscribe();
-						this.setState({ newUser: true });
+					let passwordProtected = false;
+
+					if (user !== null) {
+						passwordProtected = user.masterPassword ? true : false;
+						API.updateUserLastAccess(userID);
 					} else {
-						firebase.updateUserLastAccess(userID).subscribe();
+						API.createNewUser(userID);
 					}
+					
+					UserUtils.logIn({ userID, passwordProtected });
 				},
 				(err) => {
-					handleError(new Error('Could not check if user exists'))
+					ErrorHandler.log({
+						err: new Error('Could not check if user exists'),
+						location: 'password-list.js:82',
+					});
 				}
 			);
 	}
@@ -90,7 +94,7 @@ class PasswordList extends Component {
 			.subscribe(
 				(passwords) => { this.setState({ passwords, showLoader: false }); },
 				(err) => { 
-					handleError(new Error('Could not retrieve user\'s passwords'))
+					// handleError(new Error('Could not retrieve user\'s passwords'))
 				}
 			);
 	}
@@ -107,7 +111,7 @@ class PasswordList extends Component {
 					this.setState({ passwords: copyOfPasswords });
 				},
 				(err) => {
-					handleError(new Error('Could not delete user\'s saved password'));
+					// handleError(new Error('Could not delete user\'s saved password'));
 				}
 			);
 	}
