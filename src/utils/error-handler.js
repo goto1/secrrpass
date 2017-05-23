@@ -1,4 +1,3 @@
-import firebase from './firebase';
 import API from './api';
 
 function extractClassNameAndFunction(stack) {
@@ -28,6 +27,4 @@ function handleError(err) {
 	API.logError(error)
 }
 
-export default {
-	log: handleError,
-};
+export default { log: handleError };
