@@ -1,30 +1,25 @@
 import API from './api';
 
-function extractClassNameAndFunction(stack) {
-	let classNameAndFunction = '';
+// ErrorHandler.log({
+// 	err: new Error('Error'),
+// 	location: 'error-handler.js:10',
+// });
 
-	try {
-		classNameAndFunction = stack.slice(stack.indexOf('at ') + 3, stack.indexOf('http') - 2);
-	} catch (e) {
-		classNameAndFunction = 'N/A';
+function handleError({ err, location }) {
+	if (Object.getPrototypeOf(err).name !== 'Error' || !location) {
+		return;
 	}
-
-	return classNameAndFunction;
-}
-
-function handleError(err) {
-	if (Object.getPrototypeOf(err).name !== 'Error') { return; }
 
 	const date = new Date();
 	const error = {
-		location: extractClassNameAndFunction(err.stack),
-		message: err.message || 'N/A',
+		location: location,
+		message: err.message,
 		name: err.name || 'N/A',
 		date: date.toLocaleDateString(),
 		time: date.toLocaleTimeString(),
 	};
 
-	API.logError(error)
+	API.logError(error);
 }
 
 export default { log: handleError };
