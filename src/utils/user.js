@@ -1,12 +1,12 @@
-function logIn({ userID, passwordProtected }) {
-	if (!userID || !passwordProtected) { return; }
+function login({ userID, passwordProtected }) {
+	if (!userID) { return; }
 	const details = JSON.stringify({ userID, passwordProtected });
 
 	localStorage.setItem('user', details);
 }
 
-function logOut() {
-	localStorage.removeItem('user');
+function logout() {
+	localStorage.remove('user');
 }
 
 function getUserID() {
@@ -21,19 +21,20 @@ function getUserID() {
 	return userID;
 }
 
-function checkIfPasswordProtected(userID) {
-	if (!userID) { return; }
+function isAccountPasswordProtected() {
+	let pprotected = false;
+	const user = localStorage.getItem('user') || null;
 
-	let passwordProtected = false;
-	let userInfo = localStorage.getItem('user') || null;
-
-	if (userInfo) {
-		passwordProtected = JSON.parse(userInfo).passwordProtected;
+	if (user) {
+		pprotected = JSON.parse(user).passwordProtected;
 	}
 
-	return passwordProtected;
+	return pprotected;
 }
 
 export default {
-	logIn, logOut, getUserID, checkIfPasswordProtected,
+	login, 
+	logout, 
+	getUserID, 
+	isAccountPasswordProtected,
 };
