@@ -3,12 +3,10 @@ import { Redirect } from 'react-router';
 import { forIn } from 'lodash';
 import PasswordItem from '../containers/password-item';
 import Loader from '../views/loader';
-import firebase from '../../utils/firebase';
 import API from '../../utils/api';
 import { generateRandomID } from '../../utils/generators';
 import ErrorHandler from '../../utils/error-handler';
 import UserUtils from '../../utils/user';
-import { extractData, decryptUserPasswords } from '../../utils/response-handler';
 
 function NoPasswords() {
 	const styles = {
@@ -60,9 +58,7 @@ class PasswordList extends Component {
 		const { match } = this.props;
 		const userID = match.params.userID || generateRandomID();
 
-		localStorage.setItem('userID', userID);
-
-		API.checkIfUserExists(userID)
+		this.checkIfUserExists = API.checkIfUserExists(userID)
 			.subscribe(
 				(user) => {
 					let passwordProtected = false;
@@ -73,46 +69,53 @@ class PasswordList extends Component {
 					} else {
 						API.createNewUser(userID);
 					}
-					
-					UserUtils.logIn({ userID, passwordProtected });
+
+					UserUtils.login({ userID, passwordProtected });
 				},
-				(err) => {
-					ErrorHandler.log({
-						err: new Error('Could not check if user exists'),
-						location: 'password-list.js:82',
-					});
-				}
+				err => ErrorHandler.log({
+					err: new Error(`Coudln't check if user exists`),
+					location: 'password-list.js:79',
+				})
 			);
 	}
 
 	componentDidMount() {
-		const userID = localStorage.getItem('userID');
+		const userID = UserUtils.getUserID();
 
-		firebase.getUserPasswords(userID)
-			.map(extractData)
-			.map(decryptUserPasswords)
+		this.getUserPasswords = API.getUserPasswords(userID)
 			.subscribe(
-				(passwords) => { this.setState({ passwords, showLoader: false }); },
-				(err) => { 
-					// handleError(new Error('Could not retrieve user\'s passwords'))
-				}
+				passwords => this.setState({ passwords, showLoader: false }),
+				err => ErrorHandler.log({
+					err: new Error(`Couldn't get user passwords`),
+					location: 'password-list.js:94',
+				})
 			);
 	}
 
+	componentWillUnmount() {
+		// Cleanup
+		this.checkIfUserExists.unsubscribe();
+		this.getUserPasswords.unsubscribe();
+
+		if (this.deletePassword) {
+			this.deletePassword.unsubscribe();
+		}
+	}
+
 	deletePassword(passwordID) {
-		const userID = localStorage.getItem('userID');
+		const userID = UserUtils.getUserID();
 
-		firebase.deletePassword(userID, passwordID)
+		this.deletePassword = API.deletePassword(userID, passwordID)
 			.subscribe(
-				(res) => {
-					const copyOfPasswords = Object.assign({}, this.state.passwords);
-					delete copyOfPasswords[passwordID];
-
-					this.setState({ passwords: copyOfPasswords });
+				response => {
+					const updatedPasswordList = { ...this.state.passwords };
+					delete updatedPasswordList[passwordID];
+					this.setState({ passwords: updatedPasswordList });
 				},
-				(err) => {
-					// handleError(new Error('Could not delete user\'s saved password'));
-				}
+				err => ErrorHandler.log({
+					err: new Error(`Couldn't delete password`),
+					location: 'password-list.js:115',
+				})
 			);
 	}
 
@@ -146,6 +149,11 @@ class PasswordList extends Component {
 		const expectedPath = `/${localStorage.getItem('userID')}`;
 		const passwordList = this.getListOfPasswords();
 		const styles = this.getStyles();
+
+		if (UserUtils.isAccountPasswordProtected()) {
+			// Return form
+			console.log('Yes');
+		}
 
 		return (
 			<div style={styles}>
