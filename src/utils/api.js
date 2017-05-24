@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase';
 import ErrorHandler from './error-handler';
-import { extractData } from './response-handler';
+import { extractData, decryptUserPasswords } from './response-handler';
 import { 
 	encrypt, decrypt, 
 	generatePasswordHash, compareHashToPassword } from './security';
@@ -21,6 +21,19 @@ function checkIfValidUserID(userID) {
 	return valid;
 }
 
+function checkIfUserExists(userID) {
+	if (!checkIfValidUserID(userID)) {
+		const err = new Error('Invalid UserID');
+		ErrorHandler.log({ err: err, location: 'api.js:28' });
+		return Observable.throw(err);
+	}
+
+	const userRef = getUserReference(userID);
+
+	return Observable.fromPromise(userRef.once('value'))
+						.map(extractData);
+}
+
 function updateUserLastAccess(userID) {
 	if (!checkIfValidUserID(userID)) {
 		ErrorHandler.log('Invalid UserID for action updateUserLastAccess');
@@ -30,6 +43,19 @@ function updateUserLastAccess(userID) {
 	const lsRef = firebase.database().ref(`/users/${userID}/lastAccess`);
 
 	return Observable.fromPromise(lsRef.set(Date.now()));
+}
+
+function createNewUser(userID) {
+	if (!checkIfValidUserID(userID)) {
+		const err = new Error('Invalid UserID');
+		ErrorHandler.log({ err: err, location: 'api.js:51' });
+		return Observable.throw(err);
+	}
+
+	const userRef = getUserReference(userID);
+	const access = { firstAccess: Date.now(), lastAccess: Date.now() };
+
+	return Observable.fromPromise(userRef.set(access));
 }
 
 function deleteUser(userID) {
@@ -48,12 +74,31 @@ function deleteUser(userID) {
  * Password Functions
  */
 
+function checkIfValidPasswordID(id) {
+	return (typeof id === 'string' && id.length === 20) ? true : false;
+}
+
 function getPasswordReference(userID, passwordID) {
 	return firebase.database().ref(`/users/${userID}/passwords/${passwordID}`);
 }
 
 function getMasterPasswordReference(userID) {
 	return firebase.database().ref(`/users/${userID}/masterPassword`);
+}
+
+function getUserPasswords(userID) {
+	if (!checkIfValidUserID(userID)) {
+		const err = new Error(`Invalid UserID`);
+		ErrorHandler.log(err);
+		return Observable.throw(err);
+	}
+	updateUserLastAccess(userID);
+
+	const passRef = firebase.database().ref(`/users/${userID}/passwords`);
+
+	return Observable.fromPromise(passRef.once('value'))
+		.map(extractData)
+		.map(decryptUserPasswords);
 }
 
 function getPasswordDetails(userID, passwordID) {
@@ -66,6 +111,19 @@ function getPasswordDetails(userID, passwordID) {
 	const passRef = getPasswordReference(userID, passwordID);
 
 	return Observable.fromPromise(passRef.once('value')).delay(500);
+}
+
+function deletePassword(userID, passwordID) {
+	if (!checkIfValidUserID(userID) || !checkIfValidPasswordID(passwordID)) {
+		const err = new Error('Invalid UserID and/or PasswordID');
+		ErrorHandler.log(err);
+		return Observable.throw(err);
+	}
+	updateUserLastAccess(userID);
+
+	const passRef = getPasswordReference(userID, passwordID);
+
+	return Observable.fromPromise(passRef.remove());
 }
 
 function updatePassword(userID, updatedPassword) {
@@ -137,9 +195,15 @@ function logError(err) {
 }
 
 export default {
+	checkIfUserExists,
+	createNewUser,
 	deleteUser,
+	updateUserLastAccess,
 	getPasswordDetails,
+	getUserPasswords,
 	updatePassword,
+	deletePassword,
 	setMasterPassword,
 	checkIfMasterPasswordIsCorrect,
+	logError,
 };
