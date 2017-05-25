@@ -23,9 +23,7 @@ function checkIfValidUserID(userID) {
 
 function checkIfUserExists(userID) {
 	if (!checkIfValidUserID(userID)) {
-		const err = new Error('Invalid UserID');
-		ErrorHandler.log({ err: err, location: 'api.js:28' });
-		return Observable.throw(err);
+		return Observable.throw(new Error('Invalid UserID'));
 	}
 
 	const userRef = getUserReference(userID);
@@ -36,7 +34,6 @@ function checkIfUserExists(userID) {
 
 function updateUserLastAccess(userID) {
 	if (!checkIfValidUserID(userID)) {
-		ErrorHandler.log('Invalid UserID for action updateUserLastAccess');
 		return Observable.throw(new Error('Invalid UserID'));
 	}
 
@@ -47,9 +44,7 @@ function updateUserLastAccess(userID) {
 
 function createNewUser(userID) {
 	if (!checkIfValidUserID(userID)) {
-		const err = new Error('Invalid UserID');
-		ErrorHandler.log({ err: err, location: 'api.js:51' });
-		return Observable.throw(err);
+		return Observable.throw(new Error('Invalid UserID'));
 	}
 
 	const userRef = getUserReference(userID);
@@ -60,9 +55,7 @@ function createNewUser(userID) {
 
 function deleteUser(userID) {
 	if (!checkIfValidUserID(userID)) {
-		const err = new Error('Invalid UserID');
-		ErrorHandler.log(err);
-		return Observable.throw(err);
+		return Observable.throw(new Error('Invalid UserID'));
 	}
 
 	const userRef = getUserReference(userID);
@@ -88,9 +81,7 @@ function getMasterPasswordReference(userID) {
 
 function getUserPasswords(userID) {
 	if (!checkIfValidUserID(userID)) {
-		const err = new Error(`Invalid UserID`);
-		ErrorHandler.log(err);
-		return Observable.throw(err);
+		return Observable.throw(new Error('Invalid UserID'));
 	}
 	updateUserLastAccess(userID);
 
@@ -102,9 +93,8 @@ function getUserPasswords(userID) {
 }
 
 function getPasswordDetails(userID, passwordID) {
-	if (!userID || !passwordID) {
-		ErrorHandler.log('Invalid UserID for action getPasswordDetails');
-		return Observable.throw(new Error('Invalid UserID'));
+	if (!checkIfValidUserID(userID) || !checkIfValidPasswordID(passwordID)) {
+		return Observable.throw(new Error('Invalid UserID and/or PasswordID'));
 	}
 	updateUserLastAccess(userID);
 
@@ -115,9 +105,7 @@ function getPasswordDetails(userID, passwordID) {
 
 function deletePassword(userID, passwordID) {
 	if (!checkIfValidUserID(userID) || !checkIfValidPasswordID(passwordID)) {
-		const err = new Error('Invalid UserID and/or PasswordID');
-		ErrorHandler.log(err);
-		return Observable.throw(err);
+		return Observable.throw(new Error('Invalid UserID and/or PasswordID'));
 	}
 	updateUserLastAccess(userID);
 
@@ -128,10 +116,7 @@ function deletePassword(userID, passwordID) {
 
 function updatePassword(userID, updatedPassword) {
 	if (!checkIfValidUserID(userID) || !updatedPassword) {
-		const err = new Error(`Invalid UserID and/or Missing Password`);
-
-		ErrorHandler.log(err);
-		return Observable.throw(err);
+		return Observable.throw(new Error('Invalid UserID and/or Missing Password Info'));
 	}
 	updateUserLastAccess(userID);
 
@@ -153,10 +138,7 @@ function updatePassword(userID, updatedPassword) {
 
 function setMasterPassword(userID, password) {
 	if (!checkIfValidUserID(userID) || !password) {
-		const err = new Error(`Invalid UserID and/or Missing Password`);
-
-		ErrorHandler.log(err);
-		return Observable.throw(err);
+		return Observable.throw(new Error('Invalid UserID and/or Missing Password Info'));
 	}
 	updateUserLastAccess(userID);
 
@@ -168,10 +150,7 @@ function setMasterPassword(userID, password) {
 
 function checkIfMasterPasswordIsCorrect(userID, password) {
 	if (!checkIfValidUserID(userID) || !password) {
-		const err = new Error(`Invalid UserID and/or Missing Password`);
-
-		ErrorHandler.log(err);
-		return Observable.throw(err);
+		return Observable.throw(new Error('Invalid UserID and/or Missing Password Info'));
 	}
 
 	const mPassRef = getMasterPasswordReference(userID);
