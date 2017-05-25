@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-import firebase from '../../utils/firebase';
+import API from '../../utils/api';
+import UserUtils from '../../utils/user';
+import ErrorHandler from '../../utils/error-handler';
 import PasswordGeneratorForm from './password-generator-form';
 import { InputField } from '../views/input-field';
 import SuccessfulSubmission from '../views/successful-submission';
 import CardLayout from '../layouts/card';
+import ButtonBuilder from '../views/buttons';
 import { 
-	genSubmitBtn,
-	genDefaultBtn,
 	formField, 
 	updateFormFields,
 	checkIfValidForm,
@@ -49,6 +50,12 @@ class AddPasswordForm extends Component {
 		this.togglePasswordGenerator = this.togglePasswordGenerator.bind(this);
 	}
 
+	componentWillUnmount() {
+		if (this.createNewPassword) {
+			this.createNewPassword.unsubscribe();
+		}
+	}
+
 	handleChange(event) {
 		const formFields = updateFormFields(event, this.state.formFields);
 		const formValid = checkIfValidForm(formFields);
@@ -59,7 +66,7 @@ class AddPasswordForm extends Component {
 	handleSubmit(event) {
 		event.preventDefault();
 
-		const userID = localStorage.getItem('userID');
+		const userID = UserUtils.getUserID();
 		const { name, username, password } = this.state.formFields;
 		const newPassword = {
 			serviceName: name.attr.value,
@@ -67,9 +74,13 @@ class AddPasswordForm extends Component {
 			password: password.attr.value,
 		};
 
-		firebase.createNewPassword(userID, newPassword)
+		this.createNewPassword = API.createNewPassword(userID, newPassword)
 			.subscribe(
-				() => { this.setState({ formSubmitted: true }); }
+				res => this.setState({ formSubmitted: true }),
+				err => ErrorHandler.log({
+					err: new Error(`Couldn't create a new password`),
+					location: 'add-password.js:78',
+				})
 			);
 	}
 
@@ -100,13 +111,24 @@ class AddPasswordForm extends Component {
 	}
 
 	render() {
-		const { name, username, password } = this.state.formFields;
-		const PasswordGenerator = 
-			<PasswordGeneratorForm onGenerated={this.onPasswordGenerated} />;
-		const SubmitButton = genSubmitBtn('Submit', this.state.formValid);
-		const ShowPasswordGeneratorButton = 
-			genDefaultBtn('Password generator', this.togglePasswordGenerator);
 		const styles = this.getStyles();
+		const formValid = this.state.formValid;
+		const { name, username, password } = this.state.formFields;
+		const { togglePasswordGenerator, onPasswordGenerated } = this;
+
+		const SubmitButton = 
+			new ButtonBuilder()
+				.setType('submit')
+				.setName('Submit')
+				.setDisabled(!formValid)
+				.render();
+
+		const ShowPasswordGeneratorButton =
+			new ButtonBuilder()
+				.setType('button')
+				.setName('Password generator')
+				.setAction(togglePasswordGenerator)
+				.render();
 
 		if (this.state.formSubmitted) {
 			const serviceName = <span style={{ color: '#EF5A40' }}>{name.attr.value}</span>;
@@ -142,7 +164,8 @@ class AddPasswordForm extends Component {
 						transitionName="pass-gen-transition"
 						transitionEnterTimeout={200}
 						transitionLeaveTimeout={300}>
-						{ this.state.showPasswordGenerator && PasswordGenerator }
+						{ this.state.showPasswordGenerator && 
+							<PasswordGeneratorForm onGenerated={onPasswordGenerated} /> }
 					</ReactCSSTransitionGroup>
 				</CardLayout>
 			</div>
