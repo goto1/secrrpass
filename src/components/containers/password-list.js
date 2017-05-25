@@ -46,12 +46,16 @@ function NoPasswords() {
 class PasswordList extends Component {
 	constructor(props) {
 		super(props);
+
 		this.state = {
 			showLoader: true,
 			passwords: null,
+			isAccountPasswordProtected: false,
 		};
+
 		this.deletePassword = this.deletePassword.bind(this);
 		this.getListOfPasswords = this.getListOfPasswords.bind(this);
+		this.deletePassword = this.deletePassword.bind(this);
 	}
 
 	componentWillMount() {
@@ -60,21 +64,22 @@ class PasswordList extends Component {
 
 		this.checkIfUserExists = API.checkIfUserExists(userID)
 			.subscribe(
-				(user) => {
-					let passwordProtected = false;
-
+				user => {
 					if (user !== null) {
-						passwordProtected = user.masterPassword ? true : false;
+						UserUtils.setUserID(userID);
 						API.updateUserLastAccess(userID);
+
+						if (user.masterPassword !== undefined) {
+							this.setState({ isAccountPasswordProtected: true });
+						}
+
 					} else {
 						API.createNewUser(userID);
 					}
-
-					UserUtils.login({ userID, passwordProtected });
 				},
 				err => ErrorHandler.log({
-					err: new Error(`Coudln't check if user exists`),
-					location: 'password-list.js:79',
+					err: new Error(`Couldn't check if user exists`),
+					location: 'password-list.js:81',
 				})
 			);
 	}
@@ -97,15 +102,15 @@ class PasswordList extends Component {
 		this.checkIfUserExists.unsubscribe();
 		this.getUserPasswords.unsubscribe();
 
-		if (this.deletePassword) {
-			this.deletePassword.unsubscribe();
+		if (this.deletePasswordFromDB) {
+			this.deletePasswordFromDB.unsubscribe();
 		}
 	}
 
 	deletePassword(passwordID) {
 		const userID = UserUtils.getUserID();
 
-		this.deletePassword = API.deletePassword(userID, passwordID)
+		this.deletePasswordFromDB = API.deletePassword(userID, passwordID)
 			.subscribe(
 				response => {
 					const updatedPasswordList = { ...this.state.passwords };
@@ -146,13 +151,14 @@ class PasswordList extends Component {
 
 	render() {
 		const currPath = this.props.location.pathname;
-		const expectedPath = `/${localStorage.getItem('userID')}`;
+		const expectedPath = `/${UserUtils.getUserID()}`;
 		const passwordList = this.getListOfPasswords();
 		const styles = this.getStyles();
+		const { isAccountPasswordProtected } = this.state;
 
-		if (UserUtils.isAccountPasswordProtected()) {
-			// Return form
-			console.log('Yes');
+		// Display a login form when needed
+		if (isAccountPasswordProtected && UserUtils.isSessionExpired()) {
+			return <Redirect to='/login' />
 		}
 
 		return (
