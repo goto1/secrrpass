@@ -51,13 +51,9 @@ class Login extends Component {
 
 		this.checkIfLoginSuccessful = API.checkIfMasterPasswordIsCorrect(userID, password)
 			.subscribe(
-				matches => {
-					if (matches) {
-						UserUtils.login({
-							userID: userID,
-							passwordProtected: true,
-							authenticated: true,
-						});
+				correct => {
+					if (correct) {
+						UserUtils.login();
 						this.setState({ formSubmitted: true, invalidPassword: false });
 					} else {
 						this.setState({ formSubmitted: true });
@@ -65,7 +61,7 @@ class Login extends Component {
 				},
 				err => ErrorHandler.log({
 					err: new Error(`Coudln't log in the user`),
-					location: 'login.js:65',
+					location: 'login.js:64',
 				})
 			);
 	}
