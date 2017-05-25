@@ -1,40 +1,58 @@
-function login({ userID, passwordProtected }) {
-	if (!userID) { return; }
-	const details = JSON.stringify({ userID, passwordProtected });
+import { encrypt, decrypt } from './security';
 
-	localStorage.setItem('user', details);
+function login() {
+	const expire = new Date();
+	expire.setMinutes(expire.getMinutes() + 20);
+
+	const session = getSessionInfo();
+	const updated = encrypt({ expire, ...session });
+
+	localStorage.setItem('user', updated);
 }
 
 function logout() {
-	localStorage.remove('user');
+	localStorage.removeItem('user');
+}
+
+function getSessionInfo() {
+	const session = localStorage.getItem('user');
+
+	return session !== null ? decrypt(session) : null;
+}
+
+function setUserID(userID) {
+	if (!userID) { return; }
+
+	const session = getSessionInfo();
+	const updated = 
+		session !== null ? encrypt({ userID, ...session }) : encrypt({ userID });
+
+	localStorage.setItem('user', updated);
 }
 
 function getUserID() {
-	let userID = null;
-
-	const userInfo = localStorage.getItem('user') || null;
-
-	if (userInfo) {
-		userID = JSON.parse(userInfo).userID;
-	}
+	const session = getSessionInfo();
+	const userID = session !== null ? session.userID : null;
 
 	return userID;
 }
 
-function isAccountPasswordProtected() {
-	let pprotected = false;
-	const user = localStorage.getItem('user') || null;
+function isSessionExpired() {
+	const session = getSessionInfo();
 
-	if (user) {
-		pprotected = JSON.parse(user).passwordProtected;
+	let expired = true;
+
+	if (session !== null && session.expire) {
+		expired = session.expire < Date.now() ? true : false;
 	}
 
-	return pprotected;
+	return expired;
 }
 
 export default {
-	login, 
-	logout, 
-	getUserID, 
-	isAccountPasswordProtected,
+	login,
+	logout,
+	getUserID,
+	isSessionExpired,
+	setUserID,
 };
