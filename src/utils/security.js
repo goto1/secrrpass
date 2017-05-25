@@ -8,7 +8,7 @@ function encrypt(data) {
 	let temp = data;
 
 	if (typeof data === 'object') {
-		temp = JSON.strinigfy({ ...data });
+		temp = JSON.stringify({ ...data });
 	}
 
 	return sjcl.encrypt(secret.key, temp);
