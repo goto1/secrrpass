@@ -1,10 +1,13 @@
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase';
 import ErrorHandler from './error-handler';
+import secret from '../config/secret';
 import { extractData, decryptUserPasswords } from './response-handler';
 import { 
 	encrypt, decrypt, 
 	generatePasswordHash, compareHashToPassword } from './security';
+
+firebase.initializeApp(decrypt(secret.firebase));
 
 /**
  * User Functions
@@ -77,6 +80,26 @@ function getPasswordReference(userID, passwordID) {
 
 function getMasterPasswordReference(userID) {
 	return firebase.database().ref(`/users/${userID}/masterPassword`);
+}
+
+function createNewPassword(userID, passwordInfo) {
+	if (!checkIfValidUserID(userID) || !passwordInfo) {
+		return Observable.throw(new Error('Invalid UserID and/or Missing Password Info'));
+	}
+
+	const passID = firebase.database().ref().child('passwords').push().key;
+	const passRef = getPasswordReference(userID, passID);
+	const password = {
+		serviceName: passwordInfo.serviceName,
+		userName: passwordInfo.userName,
+		password: passwordInfo.password,
+		createdAt: Date.now(),
+		updatedAt: Date.now(),
+	};
+	const encrypted = encrypt(password);
+
+	return Observable.fromPromise(passRef.set(encrypted))
+		.debounceTime(1000);
 }
 
 function getUserPasswords(userID) {
@@ -178,6 +201,7 @@ export default {
 	createNewUser,
 	deleteUser,
 	updateUserLastAccess,
+	createNewPassword,
 	getPasswordDetails,
 	getUserPasswords,
 	updatePassword,
