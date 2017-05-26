@@ -1,18 +1,11 @@
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-import API from '../../utils/api';
-import UserUtils from '../../utils/user';
-import ErrorHandler from '../../utils/error-handler';
 import PasswordGeneratorForm from './password-generator-form';
 import { InputField } from '../views/input-field';
 import SuccessfulSubmission from '../views/successful-submission';
 import CardLayout from '../layouts/card';
 import ButtonBuilder from '../views/buttons';
-import { 
-	formField, 
-	updateFormFields,
-	checkIfValidForm,
-	resetForm } from '../../utils/form';
+import { API, UserUtils, ErrorHandler, FormUtils } from '../../utils/utils';
 
 class AddPasswordForm extends Component {
 	constructor() {
@@ -20,19 +13,19 @@ class AddPasswordForm extends Component {
 
 		this.state = {
 			formFields: {
-				name: formField({
+				name: FormUtils.formField({
 					type: 'text',
 					name: 'name',
 					placeholder: 'Gmail',
 					onChange: this.handleChange.bind(this),
 				}, 'Name'),
-				username: formField({
+				username: FormUtils.formField({
 					type: 'text',
 					name: 'username',
 					placeholder: 'example@gmail.com',
 					onChange: this.handleChange.bind(this),
 				}, 'Username or email address'),
-				password: formField({
+				password: FormUtils.formField({
 					type: 'text',
 					name: 'password',
 					placeholder: 'E^:24V)6F*lMS>M',
@@ -57,8 +50,8 @@ class AddPasswordForm extends Component {
 	}
 
 	handleChange(event) {
-		const formFields = updateFormFields(event, this.state.formFields);
-		const formValid = checkIfValidForm(formFields);
+		const formFields = FormUtils.updateFormFields(event, this.state.formFields);
+		const formValid = FormUtils.checkIfValidForm(formFields);
 
 		this.setState({ formFields, formValid });
 	}
@@ -97,7 +90,7 @@ class AddPasswordForm extends Component {
 	}
 
 	showAndResetForm() {
-		this.setState({ ...resetForm(this.state) });
+		this.setState({ ...FormUtils.resetForm(this.state) });
 	}
 
 	getStyles() {
