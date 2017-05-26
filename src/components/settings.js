@@ -1,347 +1,187 @@
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-import Card from './layouts/card';
-import formUtils from '../utils/form';
-import firebase from '../utils/firebase';
-import securityUtils from '../utils/security-utils';
+import Card from '../layouts/card';
+import ButtonBuilder from '../views/buttons';
+import { updateFormFields, checkIfValidForm } from '../../utils/form';
 import './settings.css';
 
-const SuccessfulSubmission = ({ message, action }) => (
-	<div className='SuccessfulSubmission'>
-		{message}
-		<button type="button" onClick={action}>Go Back</button>
-	</div>
-);
+function Heading({ title, showForm, toggleFormAction }) {
+	const styles = {
+		container: {
+			display: 'flex',
+			justifyContent: 'space-between',
+			color: '#F1F1F4',
+			padding: '7.5px 10px 7.5px 5px',
+			fontWeight: '300',
+			fontSize: '17.5px',
+			letterSpacing: '1.25px',
+			marginBottom: '15px',
+			borderBottomStyle: 'solid',
+			borderBottomWidth: '3px',
+			borderBottomColor: '#1F224A',
+			transition: 'all 500ms ease-in-out',
+		},
+		icon: { transition: 'all 500ms ease-in-out', },
+		iconActive: { transform: 'rotate(180deg)', },
+	};
 
-class TextInputField extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			value: '',
-			touched: false,
-			valid: false,
-		};
-		this.handleChange = this.handleChange.bind(this);
+	return (
+		<div styles={showForm ? {...styles.container, borderBottomColor: '#EF5A40'} : styles.container}>
+			<div>
+				{ title }
+			</div>
+
+			<div>
+				<i 
+					style={showForm ? {...styles.icon, ...styles.iconActive} : styles.icon}
+					className='fa fa-angle-down'
+					onClick={toggleFormAction}
+				/>
+			</div>
+		</div>
+	);
+}
+
+function Form(props) {
+	const styles = {
+		borderRadius: '5px',
+		background: '#F1F1F4',
+		padding: '15px 20px',
+		margin: '15px 0',
+		textAlign: 'right',
+		overflow: 'hidden',
+	};
+
+	return (
+		<div>Hi</div>
+	);
+
+	// return (
+	// 	<div>
+	// 		<Heading 
+	// 			title={title}
+	// 			showForm={showForm}
+	// 			toggleFormAction={toggleForm}
+	// 		/>
+
+	// 		<ReactCSSTransitionGroup
+	// 			transitionName='form-transition'
+	// 			transitionEnterTimeout={500}
+	// 			transitionLeaveTimeout={450}>
+	// 				{ showForm &&
+	// 					<div style={styles}>
+	// 						<form onSubmit={handleSubmit}>
+	// 							{formElements}
+	// 						</form>
+	// 					</div> }
+	// 		</ReactCSSTransitionGroup>
+	// 	</div>
+	// );
+}
+
+function InputField(props) {
+	const { attr, touched, valid } = props;
+	const styles = {
+		display: 'block',
+		border: 'none',
+		background: 'inherit',
+		paddingBottom: '2.5px',
+		borderBottom: '2.5px solid #2D3665',
+		width: '100%',
+		margin: '5px auto 20px auto',
+		fontSize: '17.5px',
+		color: '#1F224A',
+		borderBottomWidth: '2px',
+		borderBottomStyle: 'solid',
+	};
+
+	if (touched && !valid) {
+		styles.borderBottomColor = '#CC0000';
+	} else if (touched) {
+		styles.borderBottomColor = '#35D235';
 	}
-
-	handleChange(event) {
-		const value = event.target.value;
-		const { onChange, name } = this.props;
-
-		this.setState({
-			value: value,
-			valid: value.length > 0 ? true : false,
-			touched: true,
-		});
-
-		onChange({ name, value });
-	}
-
-	render() {
-		const { placeholder } = this.props;
-		const { value, valid, touched } = this.state;
-		let styles = {};
-
-		if (touched && !valid) {
-			styles = { borderBottom: '2px solid #CC0000' };
-		} else if (touched) {
-			styles = { borderBottom: '2px solid #35D235' };
-		}
-
-		return (
-			<input 
-				type="text"
-				className="TextInputField" 
-				style={styles}
-				placeholder={placeholder}
-				value={value}
-				onChange={this.handleChange} />
-		);
-	}
+	
+	return (
+		<input style={styles} {...attr} />
+	);
 }
 
 class SetMasterPassword extends Component {
-	constructor() {
-		super();
-		this.state = {
-			formFields: {
-				password: { value: '', valid: false },
-				passwordRepeated: { value: '', valid: false },
-			},
-			submitted: false,
-			error: false,
-		};
-		this.handleSubmit = this.handleSubmit.bind(this);
-		this.handleInputFieldChange = this.handleInputFieldChange.bind(this);
-		this.checkIfValidForm = this.checkIfValidForm.bind(this);
-		this.goBack = this.goBack.bind(this);
-	}
-
-	// componentWillUnmount() {
-	// 	firebase.setMasterPassword().unsubscribe();
-	// }
-
-	handleSubmit(event) {
-		event.preventDefault();
-		const { value } = this.state.formFields.password;
-		const userID = localStorage.getItem('userID');
-
-		firebase.setMasterPassword(userID, value)
-			.subscribe(
-				() => this.setState({ submitted: true }),
-				(err) => this.setState({ error: true }),
-			);
-	}
-
-	handleInputFieldChange({ name, value }) {
-		const item = { value, valid: value.length > 0 ? true : false };
-		const updated = {...this.state.formFields, [name]: item};
-		
-		this.setState({ formFields: updated });
-	}
-
-	checkIfValidForm() {
-		const { checkIfFormValid, checkIfFieldsMatching } = formUtils;
-		const { formFields } = this.state;
-		const { password, passwordRepeated } = this.state.formFields;
-
-		return checkIfFormValid(formFields) && checkIfFieldsMatching(password, passwordRepeated);
-	}
-
-	goBack() {
-		this.setState({
-			formFields: {
-				password: { value: '', valid: false },
-				passwordRepeated: { value: '', valid: false },
-			},
-			submitted: false,
-			error: false,
-		});
-	}
-
-	render() {
-		const isFormValid = this.checkIfValidForm();
-		const submissionMessage = 'Your master password was successfully set!';
-
-		return (
-			<div>
-				{ this.state.submitted ? (
-					<SuccessfulSubmission 
-						message={submissionMessage} 
-						action={this.goBack} />
-				) : (
-					<form className='Form' onSubmit={this.handleSubmit}>
-						<TextInputField
-							name='password'
-							placeholder='Master password'
-							onChange={this.handleInputFieldChange} />
-						<TextInputField
-							name='passwordRepeated'
-							placeholder='Repeat password'
-							onChange={this.handleInputFieldChange} />
-						<input type="submit" value="Submit" disabled={!isFormValid} />
-					</form>
-				) }
-			</div>
-		);
-	}
-}
-
-class ChangePasswordForm extends Component {
-	constructor() {
-		super();
-		this.state = {
-			formFields: {
-				currPass: { value: '', valid: false },
-				newPass: { value: '', valid: false },
-				newPassRepeated: { value: '', valid: false },
-			},
-			submitted: false,
-			error: false,
-		};
-		this.handleSubmit = this.handleSubmit.bind(this);
-		this.handleInputFieldChange = this.handleInputFieldChange.bind(this);
-		this.checkIfValidForm = this.checkIfValidForm.bind(this);
-		this.goBack = this.goBack.bind(this);
-	}
-
-	handleSubmit(event) {
-		event.preventDefault();
-		const { currPass, newPass, newPassRepeated } = this.state.formFields;
-		const userID = localStorage.getItem('userID');
-
-		const extract = data => data.val();
-
-		firebase.getMasterPassword(userID)
-			.map(extract)
-			.subscribe(
-				(hash) => {
-					if (securityUtils.compareHashToPassword(currPass.value, hash)) {
-						firebase.setMasterPassword(userID, newPass.value).subscribe();
-						this.setState({ submitted: true });
-					} else {
-						this.setState({ error: true });
-					}
-				},
-				(err) => { console.log(err); },
-			);
-	}
-
-	handleInputFieldChange({ name, value }) {
-		const item = { value, valid: value.length > 0 ? true : false };
-		const updated = {...this.state.formFields, [name]: item};
-		
-		this.setState({ formFields: updated });
-	}
-
-	checkIfValidForm() {
-		const { checkIfFormValid, checkIfFieldsMatching } = formUtils;
-		const { formFields } = this.state;
-		const { newPass, newPassRepeated } = this.state.formFields;
-
-		return checkIfFormValid(formFields) && checkIfFieldsMatching(newPass, newPassRepeated);
-	}
-
-	goBack() {
-		this.setState({
-			formFields: {
-				currPass: { value: '', valid: false },
-				newPass: { value: '', valid: false },
-				newPassRepeated: { value: '', valid: false },
-			},
-			submitted: false,
-			error: false,
-		});
-	}
-
-	render() {
-		const isFormValid = this.checkIfValidForm();
-		console.log(this.state.submitted);
-
-		return (
-			<div>
-				{ this.state.submitted ? (
-					<SuccessfulSubmission
-						message='You have successfully changed your master password!'
-						action={this.goBack} />
-				) : (
-					<form className="Form" onSubmit={this.handleSubmit}>
-						<TextInputField
-							name="currPass"
-							placeholder="Current password"
-							onChange={this.handleInputFieldChange} />
-						<TextInputField
-							name="newPass"
-							placeholder="New password"
-							onChange={this.handleInputFieldChange} />
-						<TextInputField
-							name="newPassRepeated"
-							placeholder="Repeat new password"
-							onChange={this.handleInputFieldChange} />
-						<input type="submit" value="Submit" disabled={!isFormValid} />
-					</form>
-				) }
-			</div>
-		);
-	}
-}
-
-class DeleteAccountForm extends Component {
-	constructor() {
-		super();
-		this.state = { password: '' };
-		this.handleSubmit = this.handleSubmit.bind(this);
-		this.handleInputFieldChange = this.handleInputFieldChange.bind(this);
-	}
-
-	handleSubmit(event) {
-		event.preventDefault();
-		const userID = localStorage.getItem('userID');
-
-		firebase.deleteUser(userID).subscribe();
-		localStorage.removeItem('userID');
-		// TODO: redirect to the front page
-	}
-
-	handleInputFieldChange({ name, value }) {
-		this.setState({ [name]: value });
-	}
-
-	render() {
-		return (
-			<form className="Form" onSubmit={this.handleSubmit}>
-				<TextInputField 
-					name="password"
-					placeholder="Current password"
-					onChange={this.handleInputFieldChange} />
-				<input 
-					type="submit" 
-					style={{ border: '3px solid red' }}
-					value="Delete account" />
-			</form>
-		);
-	}
-}
-
-class SettingsOption extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { showForm: false };
-		this.toggleShowForm = this.toggleShowForm.bind(this);
+
+		this.state = {
+			formFields: {
+				masterPassword: {
+					attr: {
+						type: 'text',
+						name: 'masterPassword',
+						placeholder: 'Master Password',
+						onChange: this.handleChange.bind(this),
+					},
+					touched: false,
+					valid: false,
+				},
+				masterPasswordRepeated: {
+					attr: {
+						type: 'text',
+						name: 'masterPasswordRepeated',
+						placeholder: 'Repeat Password',
+						onChange: this.handleChange.bind(this),
+					},
+					touched: false,
+					valid: false,
+				},
+			},
+			formSubmitted: false,
+			formValid: false,
+			showForm: false,
+		};
+
+		this.handleSubmit = this.handleSubmit.bind(this);
+		this.toggleForm = this.toggleForm.bind(this);
 	}
 
-	toggleShowForm(event) {
+	handleSubmit(event) {
+		event.preventDefault();
+	}
+
+	handleChange(event) {
+		const formFields = updateFormFields(event, this.state.formFields);
+		const formValid = checkIfValidForm(formFields);
+
+		this.setState({ formFields, formValid });
+	}
+
+	toggleForm() {
 		this.setState({ showForm: !this.state.showForm });
 	}
 
 	render() {
-		const { showForm } = this.state;
-		const { desc, form } = this.props;
-		const iconClassNames = showForm ? 'fa fa-angle-down rotate' : 'fa fa-angle-down';
-		const descStyles = showForm ? { borderBottomColor: '#EF5A40' } : { borderBottomColor: '#1F224A' };
+		const { formValid, showForm, formFields } = this.state;
+		const { handleSubmit, toggleForm } = this.handleSubmit;
+		const formAttributes = {
+			title: 'Set Master Password',
+			showForm: showForm,
+			toggleForm: toggleForm,
+			handleSubmit: handleSubmit,
+		};
+
 		return (
-			<div className="SettingsOption">
-				<div className="Description" style={descStyles}>
-					<div>{desc}</div>
-					<div>
-						<i 
-							className={iconClassNames} 
-							aria-hidden="true" 
-							onClick={this.toggleShowForm} />
-					</div>
-				</div>
-				<ReactCSSTransitionGroup
-					transitionName="form-transition"
-					transitionEnterTimeout={500}
-					transitionLeaveTimeout={450}>
-					{ showForm && form }
-				</ReactCSSTransitionGroup>
-			</div>
+
+			<Form formAttributes>
+				<InputField {...formFields.masterPassword} />
+				<InputField {...formFields.masterPasswordRepeated} />
+			</Form>
+
 		);
 	}
 }
 
-const SetMasterPasswordOption = () => {
-	const form = <SetMasterPassword key='1' />
-	return <SettingsOption desc='Set Master Password' form={form} />;
-};
-
-const ChangePasswordOption = () => {
-	const form = <ChangePasswordForm key='1' />;
-	return <SettingsOption desc="Change Password" form={form} />;
-};
-
-const DeleteAccountOption = () => {
-	const form = <DeleteAccountForm key='1' />;
-	return <SettingsOption desc="Delete Account" form={form} />;
+function Settings() {
+	return (
+		<Card heading='Settings'>
+			<SetMasterPassword />
+		</Card>
+	);
 }
-
-const Settings = () => (
-	<Card heading="Settings">
-		<SetMasterPasswordOption />
-		<ChangePasswordOption />
-		<DeleteAccountOption />
-	</Card>
-);
-
-export default Settings;
