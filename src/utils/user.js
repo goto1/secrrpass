@@ -5,7 +5,7 @@ function login() {
 	expire.setMinutes(expire.getMinutes() + 20);
 
 	const session = getSessionInfo();
-	const updated = encrypt({ expire, ...session });
+	const updated = encrypt({ ...session, expire });
 
 	localStorage.setItem('user', updated);
 }
@@ -39,11 +39,11 @@ function getUserID() {
 
 function isSessionExpired() {
 	const session = getSessionInfo();
-
+	const currTime = new Date().toISOString();
 	let expired = true;
 
 	if (session !== null && session.expire) {
-		expired = session.expire < Date.now() ? true : false;
+		expired = session.expire < currTime ? true : false;
 	}
 
 	return expired;
