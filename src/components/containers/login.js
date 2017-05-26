@@ -3,10 +3,7 @@ import { Redirect } from 'react-router';
 import CardLayout from '../layouts/card';
 import { InputField } from '../views/input-field';
 import ButtonBuilder from '../views/buttons';
-import API from '../../utils/api';
-import UserUtils from '../../utils/user';
-import ErrorHandler from '../../utils/error-handler';
-import { formField, updateFormFields, checkIfValidForm } from '../../utils/form';
+import { API, ErrorHandler, UserUtils, FormUtils } from '../../utils/utils';
 
 class Login extends Component {
 	constructor(props) {
@@ -14,7 +11,7 @@ class Login extends Component {
 
 		this.state = {
 			formFields: {
-				password: formField({
+				password: FormUtils.formField({
 					type: 'password',
 					name: 'password',
 					placeholder: 'E^:24V)6F*lMS>M',
@@ -37,8 +34,8 @@ class Login extends Component {
 	}
 
 	handleChange(event) {
-		const formFields = updateFormFields(event, this.state.formFields);
-		const formValid = checkIfValidForm(formFields);
+		const formFields = FormUtils.updateFormFields(event, this.state.formFields);
+		const formValid = FormUtils.checkIfValidForm(formFields);
 
 		this.setState({ formFields, formValid });
 	}
