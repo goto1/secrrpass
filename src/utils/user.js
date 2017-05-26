@@ -32,27 +32,40 @@ function setUserID(userID) {
 
 function getUserID() {
 	const session = getSessionInfo();
-	const userID = session !== null ? session.userID : null;
 
-	return userID;
+	return session !== null ? session.userID : null;
+}
+
+function getExpirationDate() {
+	const session = getSessionInfo();
+
+	return session !== null ? session.expire : null;
 }
 
 function isSessionExpired() {
-	const session = getSessionInfo();
-	const currTime = new Date().toISOString();
-	let expired = true;
+	const expDate = getExpirationDate();
+	const currDate = new Date().toISOString();
 
-	if (session !== null && session.expire) {
-		expired = session.expire < currTime ? true : false;
-	}
-
-	return expired;
+	return expDate < currDate ? true : false;
 }
+
+// function isSessionExpired() {
+// 	const session = getSessionInfo();
+// 	const currTime = new Date().toISOString();
+// 	let expired = true;
+
+// 	if (session !== null && session.expire) {
+// 		expired = session.expire < currTime ? true : false;
+// 	}
+
+// 	return expired;
+// }
 
 export default {
 	login,
 	logout,
 	getUserID,
+	getExpirationDate,
 	isSessionExpired,
 	setUserID,
 };
