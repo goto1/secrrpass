@@ -2,24 +2,12 @@ import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import CardLayout from '../layouts/card';
 import { InputField } from '../views/input-field';
-import { formField, updateFormFields } from '../../utils/form';
 import SuccessfulSubmission from '../views/successful-submission';
 import { forEach } from 'lodash';
 import PasswordGeneratorForm from './password-generator-form';
-import { handleError } from '../../utils/error-handler';
-import { getPasswordDetails, updatePassword } from '../../utils/api';
-import { extractData, decryptPasswordInfo } from '../../utils/response-handler';
 import Loader from '../views/loader';
-import {
-	genSubmitBtn,
-	genDefaultBtn,
-	checkIfValidForm } from '../../utils/form';
-
-function extractPasswordID(url) {
-	const dashPosition = url.indexOf('-');
-
-	return url.slice(dashPosition);
-}
+import ButtonBuilder from '../views/buttons';
+import { API, FormUtils, UserUtils, ErrorHandler, ResponseHandler } from '../../utils/utils';
 
 class EditPassword extends Component {
 	constructor(props) {
@@ -27,19 +15,19 @@ class EditPassword extends Component {
 
 		this.state = {
 			formFields: {
-				name: formField({
+				name: FormUtils.formField({
 					type: 'text',
 					name: 'name',
 					placeholder: 'Gmail',
 					onChange: this.handleChange.bind(this),
 				}, 'Change the name'),
-				username: formField({
+				username: FormUtils.formField({
 					type: 'text', 
 					name: 'username', 
 					placeholder: 'example@gmail.com',
 					onChange: this.handleChange.bind(this),
 				}, 'Change your username'),
-				password: formField({
+				password: FormUtils.formField({
 					type: 'text',
 					name: 'password',
 					placeholder: 'Enter or generate your password',
@@ -58,66 +46,63 @@ class EditPassword extends Component {
 	}
 
 	componentDidMount() {
-		const userID = localStorage.getItem('userID');
-		const passwordID = extractPasswordID(this.props.match.url);
+		const userID = UserUtils.getUserID();
+		const passwordID = this.props.match.params.passwordID;
 
-		this.getPasswordDetails = 
-			getPasswordDetails(userID, passwordID)
-				.map(extractData)
-				.map(decryptPasswordInfo)
-				.subscribe(
-					(response) => {
-						const { serviceName, userName, password } = response;
-						const formFields = Object.assign({}, this.state.formFields);
-						
-						formFields.name.attr.value = serviceName;
-						formFields.username.attr.value = userName;
-						formFields.password.attr.value = password;
+		this.getPassDetails = API.getPasswordDetails(userID, passwordID)
+			.subscribe(
+				response => {
+					const { serviceName, userName, password } = response;
+					const formFields = { ...this.state.formFields };
 
-						forEach(formFields, (value, key) => {
-							formFields[key].valid = true;
-						});
+					formFields.name.attr.value = serviceName;
+					formFields.username.attr.value = userName;
+					formFields.password.attr.value = password;
 
-						this.setState({ 
-							formFields, 
-							loading: false, 
-							passwordCreatedAt: response.createdAt 
-						});
-					},
-					(err) => {
-						handleError(new Error('Could not retrieve user\'s password information'));
-					}
-				);
+					forEach(formFields, (value, key) => formFields[key].valid = true);
+
+					this.setState({ formFields, loading: false, createdAt: response.createdAt });
+				},
+				err => ErrorHandler.log({
+					err: new Error(`Could't retrieve password details`),
+					location: 'edit-password.js:69'
+				})
+			);
+	}
+
+	componentWillUnmount() {
+		// cleanup
+		if (this.getPassDetails) { this.getPassDetails.unsubscribe(); }
+		if (this.updatePass) { this.updatePass.unsubscribe(); }
 	}
 
 	handleSubmit(event) {
 		event.preventDefault();
 
-		const userID = localStorage.getItem('userID');
+		const userID = UserUtils.getUserID();
 		const passwordID = this.props.match.params.passwordID;
 		const { name, username, password } = this.state.formFields;
-
-		const updated = {
+		const updatedPass = {
 			id: passwordID,
 			serviceName: name.attr.value,
 			userName: username.attr.value,
 			password: password.attr.value,
-			createdAt: this.state.passwordCreatedAt,
+			createdAt: this.state.createdAt,
 		};
 
-		this.updatePassword = 
-			updatePassword(userID, updated)
-				.subscribe(
-					() => { this.setState({ formSubmitted: true }); },
-					(err) => {
-						handleError(new Error('Error while updating password information'));
-					}
-				);
+		this.updatePass = API.updatePassword(userID, updatedPass)
+			.subscribe(
+				res => this.setState({ formSubmitted: true }),
+				err => ErrorHandler.log({
+					err: new Error(`Couldn't update user password`),
+					location: 'edit-password.js:98'
+				})
+			);
 	}
 
 	handleChange(event) {
-		const formFields = updateFormFields(event, this.state.formFields);
-		const formValid = checkIfValidForm(formFields);
+		const formFields = FormUtils.updateFormFields(event, this.state.formFields);
+		const formValid = FormUtils.checkIfValidForm(formFields);
 
 		this.setState({ formFields, formValid });
 	}
@@ -149,50 +134,51 @@ class EditPassword extends Component {
 		};
 	}
 
-	componentWillUnmount() {
-		this.getPasswordDetails.unsubscribe();
-		
-		if (this.formSubmitted) {
-			this.updatePassword.unsubscribe();
-		}
-	}
-
 	render() {
 		const styles = this.getStyles();
 		const { name, username, password } = this.state.formFields;
-		const { loading, formSubmitted, showPasswordGenerator } = this.state;
-		const handleSubmit = this.handleSubmit;
-		const SubmitButton = genSubmitBtn('Submit', this.state.formValid);
-		const PasswordGeneratorButton = genDefaultBtn('Password generator', this.togglePasswordGenerator);
+		const { loading, formSubmitted, showPasswordGenerator, formValid } = this.state;
+		const { handleSubmit, togglePasswordGenerator } = this;
+
+		const SubmitBtn = new ButtonBuilder()
+			.setType('submit')
+			.setName('Submit')
+			.setDisabled(!formValid)
+			.render();
+		const ShowPasswordGeneratorBtn = new ButtonBuilder()
+			.setType('button')
+			.setName('Password generator')
+			.setAction(togglePasswordGenerator)
+			.render();
 
 		if (loading) {
 			return <Loader />;
 		}
 
 		if (formSubmitted) {
-			const msg = 'Your password item was sucessfully updated!';
-			const userID = localStorage.getItem('userID');
-			const goToHome = () => this.props.history.push(`/${userID}`);
-			
+			const message = 'Your password was successfully updated!';
+			const userID = UserUtils.getUserID();
+			const home = () => this.props.history.push(`/${userID}`);
+
 			return (
 				<SuccessfulSubmission
-					message={msg}
+					message={message}
 					actionName='Home'
-					action={goToHome}
-			 	/>
+					action={home} 
+				/>
 			);
 		}
 
 		return (
-			<CardLayout heading="Edit Password">
+			<CardLayout heading='Edit Password'>
 				<form onSubmit={handleSubmit}>
 					<InputField {...name} />
 					<InputField {...username} />
 					<InputField {...password} />
 
 					<div style={styles.options}>
-						{ PasswordGeneratorButton }
-						{ SubmitButton }
+						{ ShowPasswordGeneratorBtn }
+						{ SubmitBtn }
 					</div>
 				</form>
 
