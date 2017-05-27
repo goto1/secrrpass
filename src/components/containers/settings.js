@@ -3,6 +3,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import Card from '../layouts/card';
 import ButtonBuilder from '../views/buttons';
 import SuccessfulSubmission from '../views/successful-submission';
+import UserUtils from '../../utils/user';
 import API from '../../utils/api';
 import ErrorHandler from '../../utils/error-handler';
 import { updateFormFields, checkIfValidForm, checkIfMatchingFields } from '../../utils/form';
@@ -336,20 +337,14 @@ class DeleteAccount extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = generateFormAttributes({
-			currentPassword: generateFormFieldAttributes({
-				name: 'currentPassword',
-				placeholder: 'Current Password',
-				onChange: this.handleChange.bind(this),
-			}),
-		});
+		this.state = { formSubmitted: false, showForm: false };
 
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.toggleForm = this.toggleForm.bind(this);
 	}
 
 	componentWillUnmount() {
-		if (this.state.formSubmitted) {
+		if (this.deleteAccount) {
 			this.deleteAccount.unsubscribe();
 		}
 	}
@@ -357,30 +352,19 @@ class DeleteAccount extends Component {
 	handleSubmit(event) {
 		event.preventDefault();
 
-		const userID = localStorage.getItem('userID');
-		const currentPassword = this.state.formFields.currentPassword.attr.value;
+		const userID = UserUtils.getUserID('userID');
 
-		this.deleteAccount = 
-			API.checkIfMasterPasswordIsCorrect(userID, currentPassword)
-				.subscribe(
-					(match) => {
-						if (match !== false) {
-							API.deleteUserAccount(userID).subscribe(
-								() => { 
-									this.setState({ formSubmitted: true }); 
-									localStorage.removeItem('userID');
-								},
-							);
-						}
-					}
-				);
-	}
-
-	handleChange(event) {
-		const formFields = updateFormFields(event, this.state.formFields);
-		const formValid = checkIfValidForm(formFields);
-
-		this.setState({ formFields, formValid });
+		this.deleteAccount = API.deleteUserAccount(userID)
+			.subscribe(
+				res => {
+					this.setState({ formSubmitted: true });
+					UserUtils.logout();
+				},
+				err => ErrorHandler.log({
+					err: new Error(`Couldn't delete user account`),
+					location: 'settings.js:363'
+				}),
+			);
 	}
 
 	toggleForm() {
@@ -388,19 +372,18 @@ class DeleteAccount extends Component {
 	}
 
 	render() {
-		const { formValid, showForm, formFields, formSubmitted } = this.state;
-		const { handleSubmit, toggleForm } = this;
+		const { showForm, formSubmitted } = this.state;
 		const formAttributes = {
 			title: 'Delete Account',
 			showForm: showForm,
-			toggleForm: toggleForm,
-			handleSubmit: handleSubmit,
+			toggleForm: this.toggleForm,
+			handleSubmit: this.handleSubmit,
 		};
 
 		const SubmitBtn = new ButtonBuilder()
 												.setType('submit-settings')
 												.setName('Delete')
-												.setDisabled(!formValid)
+												.setDisabled(false)
 												.render();
 
 		if (formSubmitted) {
@@ -414,7 +397,6 @@ class DeleteAccount extends Component {
 
 		return (
 			<Form formAttributes={formAttributes}>
-				<InputField {...formFields.currentPassword} />
 				{ SubmitBtn }
 			</Form>
 		);
@@ -422,11 +404,12 @@ class DeleteAccount extends Component {
 }
 
 function Settings(props) {
-	// TODO: show appropriate options for logged in users
+	const isExpDateSet = UserUtils.getExpirationDate(); 
+
 	return (
 		<Card heading='Settings'>
-			<SetMasterPassword {...props} />
-			<ChangeMasterPassword {...props} />
+			{ isExpDateSet && <ChangeMasterPassword {...props} /> }
+			{ !isExpDateSet && <SetMasterPassword {...props} /> }
 			<DeleteAccount {...props} />
 		</Card>
 	);

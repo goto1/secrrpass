@@ -3,10 +3,7 @@ import { Redirect } from 'react-router';
 import { forIn } from 'lodash';
 import PasswordItem from '../containers/password-item';
 import Loader from '../views/loader';
-import API from '../../utils/api';
-import { generateRandomID } from '../../utils/generators';
-import ErrorHandler from '../../utils/error-handler';
-import UserUtils from '../../utils/user';
+import { API, ErrorHandler, UserUtils, Generator } from '../../utils/utils';
 
 function NoPasswords() {
 	const styles = {
@@ -60,7 +57,7 @@ class PasswordList extends Component {
 
 	componentWillMount() {
 		const { match } = this.props;
-		const userID = match.params.userID || generateRandomID();
+		const userID = match.params.userID || Generator.generateRandomID();
 
 		this.checkIfUserExists = API.checkIfUserExists(userID)
 			.subscribe(
