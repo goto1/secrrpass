@@ -1,5 +1,5 @@
 import React from 'react';
-import { genDefaultBtn } from '../../utils/form';
+import ButtonBuilder from './buttons';
 
 function SuccessfulSubmission({ message, actionName, action }) {
 	const styles = {
@@ -23,7 +23,12 @@ function SuccessfulSubmission({ message, actionName, action }) {
 			margin: '25px auto',
 		},
 	};
-	const button = genDefaultBtn(actionName, action);
+	const button = 
+		new ButtonBuilder()
+			.setType('button')
+			.setName(actionName)
+			.setAction(action)
+			.render();
 
 	return (
 		<div style={styles.container}>

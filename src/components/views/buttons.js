@@ -24,11 +24,12 @@ class ButtonBuilder {
 	setType(type) {
 		if (typeof type !== 'string') { return; }
 
-		if (type.includes('submit') && type.length > 6) {
+		if (type === 'submit-settings') {
 			this.state.attributes['type'] = 'submit';
 			this.state.attributes['className'] = 'btn-submit-settings';
 		} else {
 			this.state.attributes['type'] = type;
+			this.updateClassName();
 		}
 
 		return this;
@@ -65,18 +66,18 @@ class ButtonBuilder {
 	}
 
 	render() {
-		this.updateClassName();
-
 		const { attributes, name } = this.state;
 
-		return <ButtonComponent attributes={attributes} name={name} />;
+		return (
+			<Button attributes={attributes} name={name} />
+		);
 	}
 }
 
-function ButtonComponent({ attributes, name }) {
+function Button({ attributes, name }) {
 	return (
 		<button {...attributes}>
-			{name}
+			{ name }
 		</button>
 	);
 }

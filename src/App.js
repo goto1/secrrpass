@@ -5,10 +5,12 @@ import './App.css';
 
 import './utils/rxjs-operators';
 
-const App = () => (
-	<Router>
-		<MainLayout />
-	</Router>
-);
+function App(props) {
+	return (
+		<Router>
+			<MainLayout />
+		</Router>
+	);
+}
 
 export default App;

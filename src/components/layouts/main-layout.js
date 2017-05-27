@@ -5,6 +5,7 @@ import PasswordList from '../containers/password-list';
 import AddPassword from '../containers/add-password';
 import EditPassword from '../containers/edit-password';
 import Settings from '../containers/settings';
+import Login from '../containers/login';
 
 const styles = {
 	layout: {
@@ -32,6 +33,7 @@ const MainLayout = () => (
 				<Route exact path="/" component={PasswordList} />
 				<Route path="/add" component={AddPassword} />
 				<Route path="/settings" component={Settings} />
+				<Route path="/login" component={Login} />
 				<Route path="/edit/:passwordID" component={EditPassword} />
 				<Route path="/:userID" component={PasswordList} />
 			</Switch>

@@ -34,9 +34,9 @@ input:focus {
 }
 
 .InputField input::placeholder {
-	color: #F3F3F5;
 	opacity: 0.65;
 	font-size: 15px;
+	color: #F3F3F5;
 }
 
 .slider {

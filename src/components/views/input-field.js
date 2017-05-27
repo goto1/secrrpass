@@ -31,5 +31,3 @@ function Slider(attributes) {
 }
 
 export { InputField, Slider };
-
-
