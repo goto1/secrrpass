@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Slider } from '../views/input-field';
-import { updateSliderValues, getPasswordRecipe } from '../../utils/form';
-import { generatePassword } from '../../utils/generators';
+import { FormUtils, Generator } from '../../utils/utils';
 
 class PasswordGeneratorForm extends Component {
 	constructor(props) {
@@ -35,19 +34,19 @@ class PasswordGeneratorForm extends Component {
 	}
 
 	componentWillMount() {
-		const recipe = getPasswordRecipe(this.state);
+		const recipe = FormUtils.getPasswordRecipe(this.state);
 
-		this.props.onGenerated(generatePassword(recipe));
+		this.props.onGenerated(Generator.generatePassword(recipe));
 	}
 
 	handleChange(event) {
 		const { name, value } = event.target;
 
 		this.setState((prevState, currProps) => {
-			const newState = updateSliderValues({ name, value }, prevState);
-			const recipe = getPasswordRecipe(newState);
+			const newState = FormUtils.updateSliderValues({ name, value }, prevState);
+			const recipe = FormUtils.getPasswordRecipe(newState);
 
-			this.props.onGenerated(generatePassword(recipe));
+			this.props.onGenerated(Generator.generatePassword(recipe));
 
 			return newState;
 		});
