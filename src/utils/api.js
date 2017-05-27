@@ -123,7 +123,9 @@ function getPasswordDetails(userID, passwordID) {
 
 	const passRef = getPasswordReference(userID, passwordID);
 
-	return Observable.fromPromise(passRef.once('value')).delay(500);
+	return Observable.fromPromise(passRef.once('value'))
+		.map(extractData)
+		.map(decrypt);
 }
 
 function deletePassword(userID, passwordID) {

@@ -1,12 +1,12 @@
 import { decrypt } from './security';
 
-function extractData(data) {
+export function extractData(data) {
 	if (!data) { return null; }
 
 	return data.val();
 }
 
-function decryptUserPasswords(data) {
+export function decryptUserPasswords(data) {
 	if (!data) { return null; }
 
 	const passwords = Object.assign({}, data);
@@ -19,7 +19,7 @@ function decryptUserPasswords(data) {
 	return decrypted;
 }
 
-export {
+export default {
 	extractData,
 	decryptUserPasswords,
 };

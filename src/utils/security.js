@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import sjcl from 'sjcl';
 import secret from '../config/secret';
 
-function encrypt(data) {
+export function encrypt(data) {
 	if (!data) { return null; }
 
 	let temp = data;
@@ -14,7 +14,7 @@ function encrypt(data) {
 	return sjcl.encrypt(secret.key, temp);
 }
 
-function decrypt(data) {
+export function decrypt(data) {
 	if (!data) { return null; }
 
 	const decrypted = sjcl.decrypt(secret.key, data);
@@ -22,19 +22,19 @@ function decrypt(data) {
 	return JSON.parse(decrypted);
 }
 
-function generatePasswordHash(password) {
+export function generatePasswordHash(password) {
 	if (!password) { return null; }
 
 	return bcrypt.hashSync(password, 10);
 }
 
-function compareHashToPassword(password, hash) {
+export function compareHashToPassword(password, hash) {
 	if (!password || !hash) { return null; }
 	
 	return bcrypt.compareSync(password, hash);
 }
 
-export {
+export default {
 	encrypt,
 	decrypt,
 	generatePasswordHash,

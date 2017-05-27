@@ -100,7 +100,4 @@ function generateRandomID() {
 	return randomID;
 }
 
-export { 
-	generatePassword,
-	generateRandomID 
-};
+export default { generatePassword, generateRandomID };

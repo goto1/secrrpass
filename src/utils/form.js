@@ -86,7 +86,7 @@ function resetForm(form) {
 	return formCopy;
 }
 
-export {
+export default {
 	formField, 
 	updateFormFields, 
 	updateSliderValues,
