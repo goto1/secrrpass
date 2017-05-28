@@ -3,14 +3,16 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import Card from '../layouts/card';
 import ButtonBuilder from '../views/buttons';
 import SuccessfulSubmission from '../views/successful-submission';
-import UserUtils from '../../utils/user';
-import API from '../../utils/api';
-import ErrorHandler from '../../utils/error-handler';
-import { updateFormFields, checkIfValidForm, checkIfMatchingFields } from '../../utils/form';
+// import UserUtils from '../../utils/user';
+// import API from '../../utils/api';
+// import ErrorHandler from '../../utils/error-handler';
+// import { updateFormFields, checkIfValidForm, checkIfMatchingFields } from '../../utils/form';
 import './settings.css';
 
+import { UserUtils, FormUtils, API, ErrorHandler } from '../../utils/utils';
+
 function genSuccSubmissionMessage({ message, push }) {
-	const userID = localStorage.getItem('userID');
+	const userID = UserUtils.getUserID();
 	let action = null;
 	
 	if (userID) {
@@ -169,9 +171,7 @@ class SetMasterPassword extends Component {
 	}
 
 	componentWillUnmount() {
-		if (this.formSubmitted) {
-			this.setMasterPassword.unsubscribe();
-		}
+		if (this.setMasterPassword) { this.setMasterPassword.unsubscribe(); }
 	}
 
 	handleSubmit(event) {
@@ -179,17 +179,19 @@ class SetMasterPassword extends Component {
 		const userID = localStorage.getItem('userID');
 		const password = this.state.formFields.masterPassword.attr.value;
 
-		this.setMasterPassword = 
-			API.setMasterPassword(userID, password)
-				.subscribe(
-					(res) => { this.setState({ formSubmitted: true }); },
-					(err) => { ErrorHandler.log(err); }
-				);
+		this.setMasterPassword = API.setMasterPassword(userID, password)
+			.subscribe(
+				response => this.setState({ formSubmitted: true }),
+				err => ErrorHandler.log({
+					err: new Error(`Couldn't not delete user account`),
+					location: 'settings.js:187'
+				})
+			);
 	}
 
 	handleChange(event) {
-		const formFields = updateFormFields(event, this.state.formFields);
-		const formValid = checkIfValidForm(formFields);
+		const formFields = FormUtils.updateFormFields(event, this.state.formFields);
+		const formValid = FormUtils.checkIfValidForm(formFields);
 
 		this.setState({ formFields, formValid });
 	}
@@ -259,9 +261,7 @@ class ChangeMasterPassword extends Component {
 	}
 
 	componentWillUnmount() {
-		if (this.state.formSubmitted) {
-			this.updateMasterPassword.unsubscribe();
-		}
+		if (this.updateMasterPassword) { this.updateMasterPassword.unsubscribe(); }
 	}
 
 	handleSubmit(event) {
@@ -269,6 +269,7 @@ class ChangeMasterPassword extends Component {
 
 		const userID = localStorage.getItem('userID');
 		const { currentPassword, newMasterPassword } = this.state.formFields;
+
 
 		this.updateMasterPassword =
 			API.checkIfMasterPasswordIsCorrect(userID, currentPassword.attr.value)
@@ -285,11 +286,12 @@ class ChangeMasterPassword extends Component {
 	}
 
 	handleChange(event) {
-		const formFields = updateFormFields(event, this.state.formFields);
+		const formFields = FormUtils.updateFormFields(event, this.state.formFields);
 		const mPass = formFields.newMasterPassword.attr;
 		const mPassRepeated = formFields.newMasterPasswordRepeated.attr;
 		const formValid = 
-			checkIfValidForm(formFields) && checkIfMatchingFields(mPass, mPassRepeated);
+			UserUtils.checkIfValidForm(formFields) && 
+			UserUtils.checkIfMatchingFields(mPass, mPassRepeated);
 
 		this.setState({ formFields, formValid });
 	}
@@ -344,9 +346,7 @@ class DeleteAccount extends Component {
 	}
 
 	componentWillUnmount() {
-		if (this.deleteAccount) {
-			this.deleteAccount.unsubscribe();
-		}
+		if (this.deleteAccount) { this.deleteAccount.unsubscribe(); }
 	}
 
 	handleSubmit(event) {
@@ -354,7 +354,7 @@ class DeleteAccount extends Component {
 
 		const userID = UserUtils.getUserID('userID');
 
-		this.deleteAccount = API.deleteUserAccount(userID)
+		this.deleteAccount = API.deleteUser(userID)
 			.subscribe(
 				res => {
 					this.setState({ formSubmitted: true });
