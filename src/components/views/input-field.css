@@ -33,12 +33,6 @@ input:focus {
 	transform: all 500ms ease-in-out;
 }
 
-.InputField input::placeholder {
-	opacity: 0.65;
-	font-size: 15px;
-	color: #F3F3F5;
-}
-
 .slider {
 	color: #202249;
 	text-align: center;
