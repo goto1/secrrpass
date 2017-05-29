@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase';
-import ErrorHandler from './error-handler';
 import secret from '../config/secret';
 import { extractData, decryptUserPasswords } from './response-handler';
+import { getUserID } from './user';
 import { 
 	encrypt, decrypt, 
 	generatePasswordHash, compareHashToPassword } from './security';
@@ -24,15 +24,16 @@ function checkIfValidUserID(userID) {
 	return valid;
 }
 
-function checkIfUserExists(userID) {
+function checkIfUserExists() {
+	const userID = getUserID();
+
 	if (!checkIfValidUserID(userID)) {
-		return Observable.throw(new Error('Invalid UserID'));
+		throw new Error(`Invalid UserID`);
 	}
 
 	const userRef = getUserReference(userID);
 
-	return Observable.fromPromise(userRef.once('value'))
-						.map(extractData);
+	return userRef.once('value').then(extractData);
 }
 
 function updateUserLastAccess(userID) {
@@ -43,6 +44,19 @@ function updateUserLastAccess(userID) {
 	const lsRef = firebase.database().ref(`/users/${userID}/lastAccess`);
 
 	return Observable.fromPromise(lsRef.set(Date.now()));
+}
+
+function createUser() {
+	const userID = getUserID();
+
+	if (!checkIfValidUserID(userID)) {
+		throw new Error(`Invalid UserID`);
+	}
+
+	const userRef = getUserReference(userID);
+	const access = { firstAccess: Date.now(), lastAccess: Date.now() };
+
+	return userRef.set(access);
 }
 
 function createNewUser(userID) {
@@ -102,17 +116,19 @@ function createNewPassword(userID, passwordInfo) {
 		.debounceTime(1000);
 }
 
-function getUserPasswords(userID) {
+function getPasswords() {
+	const userID = getUserID();
+
 	if (!checkIfValidUserID(userID)) {
-		return Observable.throw(new Error('Invalid UserID'));
+		throw new Error('Invalid UserID');
 	}
-	updateUserLastAccess(userID);
 
-	const passRef = firebase.database().ref(`/users/${userID}/passwords`);
+	const passwordsRef = 
+		firebase.database().ref(`/users/${userID}/passwords`);
 
-	return Observable.fromPromise(passRef.once('value'))
-		.map(extractData)
-		.map(decryptUserPasswords);
+	return passwordsRef.once('value')
+		.then(extractData)
+		.then(decryptUserPasswords);
 }
 
 function getPasswordDetails(userID, passwordID) {
@@ -128,15 +144,16 @@ function getPasswordDetails(userID, passwordID) {
 		.map(decrypt);
 }
 
-function deletePassword(userID, passwordID) {
-	if (!checkIfValidUserID(userID) || !checkIfValidPasswordID(passwordID)) {
-		return Observable.throw(new Error('Invalid UserID and/or PasswordID'));
+function deletePassword(passID) {
+	const userID = getUserID();
+
+	if (!checkIfValidUserID(userID) || !checkIfValidPasswordID(passID)) {
+		throw new Error('Invalid UserID and/or PasswordID');
 	}
-	updateUserLastAccess(userID);
 
-	const passRef = getPasswordReference(userID, passwordID);
+	const passRef = getPasswordReference(userID, passID);
 
-	return Observable.fromPromise(passRef.remove());
+	return passRef.remove();
 }
 
 function updatePassword(userID, updatedPassword) {
@@ -199,13 +216,14 @@ function logError(err) {
 }
 
 export default {
+	checkIfValidUserID,
 	checkIfUserExists,
-	createNewUser,
+	createUser,
 	deleteUser,
 	updateUserLastAccess,
 	createNewPassword,
 	getPasswordDetails,
-	getUserPasswords,
+	getPasswords,
 	updatePassword,
 	deletePassword,
 	setMasterPassword,
