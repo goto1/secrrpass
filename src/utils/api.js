@@ -2,7 +2,7 @@ import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase';
 import secret from '../config/secret';
 import { extractData, decryptUserPasswords } from './response-handler';
-import { getUserID } from './user';
+import { getUserID, logout } from './user';
 import { 
 	encrypt, decrypt, 
 	generatePasswordHash, compareHashToPassword } from './security';
@@ -70,15 +70,29 @@ function createNewUser(userID) {
 	return Observable.fromPromise(userRef.set(access));
 }
 
-function deleteUser(userID) {
+function deleteUser() {
+	const userID = getUserID();
+
 	if (!checkIfValidUserID(userID)) {
-		return Observable.throw(new Error('Invalid UserID'));
+		throw new Error(`Invalid UserID`);
 	}
+
+	logout();
 
 	const userRef = getUserReference(userID);
 
-	return Observable.fromPromise(userRef.remove());
+	return userRef.remove();
 }
+
+// function deleteUser(userID) {
+// 	if (!checkIfValidUserID(userID)) {
+// 		return Observable.throw(new Error('Invalid UserID'));
+// 	}
+
+// 	const userRef = getUserReference(userID);
+
+// 	return Observable.fromPromise(userRef.remove());
+// }
 
 /**
  * Password Functions

@@ -10,7 +10,7 @@ function login() {
 	localStorage.setItem('user', updated);
 }
 
-function logout() {
+export function logout() {
 	localStorage.removeItem('user');
 }
 
