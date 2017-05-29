@@ -30,7 +30,7 @@ function setUserID(userID) {
 	localStorage.setItem('user', updated);
 }
 
-function getUserID() {
+export function getUserID() {
 	const session = getSessionInfo();
 
 	return session !== null ? session.userID : null;
@@ -48,18 +48,6 @@ function isSessionExpired() {
 
 	return expDate < currDate ? true : false;
 }
-
-// function isSessionExpired() {
-// 	const session = getSessionInfo();
-// 	const currTime = new Date().toISOString();
-// 	let expired = true;
-
-// 	if (session !== null && session.expire) {
-// 		expired = session.expire < currTime ? true : false;
-// 	}
-
-// 	return expired;
-// }
 
 export default {
 	login,
