@@ -7,7 +7,7 @@ import { forEach } from 'lodash';
 import PasswordGeneratorForm from './password-generator-form';
 import Loader from '../views/loader';
 import ButtonBuilder from '../views/buttons';
-import { API, FormUtils, UserUtils, ErrorHandler, ResponseHandler } from '../../utils/utils';
+import { API, FormUtils, UserUtils, ErrorHandler } from '../../utils/utils';
 
 class EditPassword extends Component {
 	constructor(props) {
