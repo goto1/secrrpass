@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import Card from '../layouts/card';
 import ButtonBuilder from '../views/buttons';
 import SuccessfulSubmission from '../views/successful-submission';
-// import UserUtils from '../../utils/user';
-// import API from '../../utils/api';
-// import ErrorHandler from '../../utils/error-handler';
-// import { updateFormFields, checkIfValidForm, checkIfMatchingFields } from '../../utils/form';
 import './settings.css';
 
 import { UserUtils, FormUtils, API, ErrorHandler } from '../../utils/utils';
@@ -345,26 +342,12 @@ class DeleteAccount extends Component {
 		this.toggleForm = this.toggleForm.bind(this);
 	}
 
-	componentWillUnmount() {
-		if (this.deleteAccount) { this.deleteAccount.unsubscribe(); }
-	}
-
 	handleSubmit(event) {
 		event.preventDefault();
 
-		const userID = UserUtils.getUserID('userID');
-
-		this.deleteAccount = API.deleteUser(userID)
-			.subscribe(
-				res => {
-					this.setState({ formSubmitted: true });
-					UserUtils.logout();
-				},
-				err => ErrorHandler.log({
-					err: new Error(`Couldn't delete user account`),
-					location: 'settings.js:363'
-				}),
-			);
+		API.deleteUser()
+			.then(res => this.setState({ formSubmitted: true }))
+			.catch(err => ErrorHandler({ err, location: 'settings.js:354' }));
 	}
 
 	toggleForm() {
@@ -387,12 +370,7 @@ class DeleteAccount extends Component {
 												.render();
 
 		if (formSubmitted) {
-			const success = genSuccSubmissionMessage({
-				message: 'Your account was deleted!',
-				push: this.props.history.push,
-			});
-
-			return success;
+			return <Redirect to='/' />;
 		}
 
 		return (

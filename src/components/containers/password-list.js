@@ -63,6 +63,8 @@ class PasswordList extends Component {
 
 		UserUtils.setUserID(userID);
 
+		console.log(UserUtils.getUserID());
+
 		API.checkIfUserExists()
 			.then(user => {
 				if (user !== null && user.hasOwnProperty('firstAccess')) {
