@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router';
-import { forIn } from 'lodash';
+import * as _ from 'lodash';
 import PasswordItem from '../containers/password-item';
 import Loader from '../views/loader';
 import { API, ErrorHandler, UserUtils, Generator } from '../../utils/utils';
@@ -48,6 +48,7 @@ class PasswordList extends Component {
 			showLoader: true,
 			passwords: null,
 			isAccountPasswordProtected: false,
+			userID: props.match.params.userID,
 		};
 
 		this.deletePassword = this.deletePassword.bind(this);
@@ -55,70 +56,36 @@ class PasswordList extends Component {
 		this.deletePassword = this.deletePassword.bind(this);
 	}
 
-	componentWillMount() {
-		const { match } = this.props;
-		const userID = match.params.userID || Generator.generateRandomID();
-
-		this.checkIfUserExists = API.checkIfUserExists(userID)
-			.subscribe(
-				user => {
-					if (user !== null) {
-						UserUtils.setUserID(userID);
-						API.updateUserLastAccess(userID);
-
-						if (user.masterPassword !== undefined) {
-							this.setState({ isAccountPasswordProtected: true });
-						}
-
-					} else {
-						API.createNewUser(userID);
-					}
-				},
-				err => ErrorHandler.log({
-					err: new Error(`Couldn't check if user exists`),
-					location: 'password-list.js:81',
-				})
-			);
-	}
-
 	componentDidMount() {
-		const userID = UserUtils.getUserID();
+		const userID = API.checkIfValidUserID(this.state.userID) ? 
+			this.state.userID : 
+			Generator.generateRandomID();
 
-		this.getUserPasswords = API.getUserPasswords(userID)
-			.subscribe(
-				passwords => this.setState({ passwords, showLoader: false }),
-				err => ErrorHandler.log({
-					err: new Error(`Couldn't get user passwords`),
-					location: 'password-list.js:94',
-				})
-			);
+		UserUtils.setUserID(userID);
+
+		API.checkIfUserExists()
+			.then(user => {
+				if (user !== null && user.hasOwnProperty('firstAccess')) {
+					this.setState({ isAccountPasswordProtected: user.masterPassword ? true : false });
+				} else {
+					API.createUser();
+				}
+			})
+			.catch(err => ErrorHandler.log({ err, location: 'password-list.js:75' }));
+
+		API.getPasswords()
+			.then(passwords => this.setState({ passwords, showLoader: false }))
+			.catch(err => ErrorHandler.log({ err, location: 'password-list.js:79' }));
 	}
-
-	componentWillUnmount() {
-		// Cleanup
-		this.checkIfUserExists.unsubscribe();
-		this.getUserPasswords.unsubscribe();
-
-		if (this.deletePasswordFromDB) {
-			this.deletePasswordFromDB.unsubscribe();
-		}
-	}
-
-	deletePassword(passwordID) {
-		const userID = UserUtils.getUserID();
-
-		this.deletePasswordFromDB = API.deletePassword(userID, passwordID)
-			.subscribe(
-				response => {
-					const updatedPasswordList = { ...this.state.passwords };
-					delete updatedPasswordList[passwordID];
-					this.setState({ passwords: updatedPasswordList });
-				},
-				err => ErrorHandler.log({
-					err: new Error(`Couldn't delete password`),
-					location: 'password-list.js:115',
-				})
-			);
+	
+	deletePassword(passID) {
+		API.deletePassword(passID)
+			.then(res => {
+				const passwords = _.filter(this.state.passwords,
+					(password, id) => id !== passID);
+				this.setState({ passwords });
+			})
+			.catch(err => ErrorHandler.log({ err, location: 'password-list.js:89' }));
 	}
 
 	getListOfPasswords() {
@@ -130,7 +97,7 @@ class PasswordList extends Component {
 		if (passwords) {
 			const temp = [];
 
-			forIn(passwords, (value, key) => {
+			_.forIn(passwords, (value, key) => {
 				temp.push({ id: key, ...value });
 			});
 
@@ -147,8 +114,9 @@ class PasswordList extends Component {
 	}
 
 	render() {
+		const userID = UserUtils.getUserID();
 		const currPath = this.props.location.pathname;
-		const expectedPath = `/${UserUtils.getUserID()}`;
+		const expectedPath = `/${userID}`;
 		const passwordList = this.getListOfPasswords();
 		const styles = this.getStyles();
 		const { isAccountPasswordProtected } = this.state;
@@ -158,10 +126,13 @@ class PasswordList extends Component {
 			return <Redirect to='/login' />
 		}
 
+		if (	API.checkIfValidUserID(userID) && 
+					(currPath !== expectedPath)) {
+			return <Redirect to={expectedPath} />;
+		}
+
 		return (
 			<div style={styles}>
-				{ (currPath !== expectedPath) && <Redirect to={expectedPath} /> }
-
 				{ this.state.showLoader && <Loader /> }
 
 				{ passwordList ? (
