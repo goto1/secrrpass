@@ -46,7 +46,7 @@ class Login extends Component {
 		const userID = UserUtils.getUserID();
 		const password = this.state.formFields.password.attr.value;
 
-		this.checkIfLoginSuccessful = API.checkIfMasterPasswordIsCorrect(userID, password)
+		this.checkIfLoginSuccessful = API.checkIfValidMasterPassword(password)
 			.subscribe(
 				correct => {
 					if (correct) {
@@ -56,10 +56,7 @@ class Login extends Component {
 						this.setState({ formSubmitted: true });
 					}
 				},
-				err => ErrorHandler.log({
-					err: new Error(`Coudln't log in the user`),
-					location: 'login.js:64',
-				})
+				err => ErrorHandler.log({ err, location: 'login.js:59' })
 			);
 	}
 

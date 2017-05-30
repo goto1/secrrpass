@@ -209,12 +209,7 @@ class SetMasterPassword extends Component {
 										.render();
 
 		if (formSubmitted) {
-			const success = genSuccSubmissionMessage({
-				message: 'Your master password was set!',
-				push: this.props.history.push,
-			});
-
-			return success;
+			return <Redirect to={'/' + UserUtils.getUserID()} />
 		}
 
 		return (
@@ -260,22 +255,21 @@ class ChangeMasterPassword extends Component {
 	handleSubmit(event) {
 		event.preventDefault();
 
-		const userID = localStorage.getItem('userID');
 		const { currentPassword, newMasterPassword } = this.state.formFields;
+		const currPassVal = currentPassword.attr.value;
+		const newMPassVal = newMasterPassword.attr.value;
 
-
-		this.updateMasterPassword =
-			API.checkIfMasterPasswordIsCorrect(userID, currentPassword.attr.value)
-				.subscribe(
-					(match) => {
-						if (match !== false) {
-							API.setMasterPassword(userID, newMasterPassword.attr.value)
-								.subscribe(
-									() => { this.setState({ formSubmitted: true }); }	
-								);
-						}
+		this.updateMasterPassword = 
+			API.checkIfValidMasterPassword(currPassVal).subscribe(
+				match => {
+					if (match !== false) {
+						API.setMasterPassword(newMPassVal).subscribe(
+							res => this.setState({ formSubmitted: true })
+						);
 					}
-				);
+				},
+				err => ErrorHandler.log({ err, location: 'settings.js:273' })
+			);
 	}
 
 	handleChange(event) {
@@ -283,8 +277,8 @@ class ChangeMasterPassword extends Component {
 		const mPass = formFields.newMasterPassword.attr;
 		const mPassRepeated = formFields.newMasterPasswordRepeated.attr;
 		const formValid = 
-			UserUtils.checkIfValidForm(formFields) && 
-			UserUtils.checkIfMatchingFields(mPass, mPassRepeated);
+			FormUtils.checkIfValidForm(formFields) && 
+			FormUtils.checkIfMatchingFields(mPass, mPassRepeated);
 
 		this.setState({ formFields, formValid });
 	}
@@ -309,12 +303,7 @@ class ChangeMasterPassword extends Component {
 												.render();
 
 		if (formSubmitted) {
-			const success = genSuccSubmissionMessage({
-				message: 'Your master password was changed!',
-				push: this.props.history.push,
-			});
-
-			return success;
+			return <Redirect to={'/' + UserUtils.getUserID()} />
 		}
 
 		return (
@@ -378,12 +367,19 @@ class DeleteAccount extends Component {
 }
 
 function Settings(props) {
-	const isExpDateSet = UserUtils.getExpirationDate(); 
+	const isSessionExpired = UserUtils.isSessionExpired();
+	const isAccountProtected = UserUtils.isAccountProtected();
+
+	if (isAccountProtected && isSessionExpired) {
+		return <Redirect to='/login' />;
+	}
 
 	return (
 		<Card heading='Settings'>
-			{ isExpDateSet && <ChangeMasterPassword {...props} /> }
-			{ !isExpDateSet && <SetMasterPassword {...props} /> }
+			{ isAccountProtected &&
+				!isSessionExpired &&
+				<ChangeMasterPassword /> }
+			{ !isAccountProtected && <SetMasterPassword /> }
 			<DeleteAccount {...props} />
 		</Card>
 	);

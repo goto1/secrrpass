@@ -44,38 +44,37 @@ class PasswordList extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			showLoader: true,
-			passwords: null,
-			userID: props.match.params.userID,
-		};
+		this.state = { showLoader: true, passwords: null };
 
 		this.deletePassword = this.deletePassword.bind(this);
 		this.getListOfPasswords = this.getListOfPasswords.bind(this);
 		this.deletePassword = this.deletePassword.bind(this);
+
+		this.setup();
+	}
+
+	setup() {
+		const paramsUserID = this.props.match.params.userID;
+		const userID = 
+			API.checkIfValidUserID(paramsUserID) ? paramsUserID : Generator.generateRandomID();
+
+		if (UserUtils.getUserID() !== userID) { UserUtils.init(userID); }
 	}
 
 	componentDidMount() {
-		const userID = API.checkIfValidUserID(this.state.userID) ? 
-			this.state.userID : 
-			Generator.generateRandomID();
-
-		API.checkIfUserExists(userID).then(
-			user => {
+		API.checkIfUserExists()
+			.then(user => {
 				if (user === null) { API.createUser(); }
 
 				const mPassSet = user.masterPassword !== undefined ? true : false;
 
-				if (UserUtils.getUserID() === null && UserUtils.getUserID() !== userID) {
-					UserUtils.init(userID, mPassSet);
-				}
-			}
-		)
-		.catch(err => ErrorHandler.log({ err, location: 'password-list.js:74' }));
+				UserUtils.update(mPassSet);
+			})
+			.catch(err => ErrorHandler.log({ err, location: 'password-list.js:73' }));
 
-		API.getPasswords(userID)
+		API.getPasswords()
 			.then(passwords => this.setState({ passwords, showLoader: false }))
-			.catch(err => ErrorHandler.log({ err, location: 'password-list.js:79' }));
+			.catch(err => ErrorHandler.log({ err, location: 'password-list.js:77' }));
 	}
 	
 	deletePassword(passID) {
@@ -85,7 +84,7 @@ class PasswordList extends Component {
 					(password, id) => id !== passID);
 				this.setState({ passwords });
 			})
-			.catch(err => ErrorHandler.log({ err, location: 'password-list.js:89' }));
+			.catch(err => ErrorHandler.log({ err, location: 'password-list.js:91' }));
 	}
 
 	getListOfPasswords() {
