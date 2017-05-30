@@ -173,17 +173,13 @@ class SetMasterPassword extends Component {
 
 	handleSubmit(event) {
 		event.preventDefault();
-		const userID = localStorage.getItem('userID');
+
 		const password = this.state.formFields.masterPassword.attr.value;
 
-		this.setMasterPassword = API.setMasterPassword(userID, password)
-			.subscribe(
-				response => this.setState({ formSubmitted: true }),
-				err => ErrorHandler.log({
-					err: new Error(`Couldn't not delete user account`),
-					location: 'settings.js:187'
-				})
-			);
+		this.setMasterPassword = API.setMasterPassword(password).subscribe(
+			res => this.setState({ formSubmitted: true }),
+			err => ErrorHandler.log({ err, location: 'settings.js:181' })
+		);
 	}
 
 	handleChange(event) {
