@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { UserUtils } from '../../utils/utils';
 
 const navStyle = {
 	display: 'flex',
@@ -28,11 +29,11 @@ const NavItem = ({ type }) => (
 );
 
 const NavigationMenu = () => {
-	const userID = localStorage.getItem('userID') || '';
+	const userID = UserUtils.getUserID();
 
 	return (
 		<div style={navStyle}>
-			<Link to={userID ? `/${userID}` : '/'}>
+			<Link to={userID !== null ? `/${userID}` : '/'}>
 				<NavItem type='home' />
 			</Link>
 			<Link to='/add'>
