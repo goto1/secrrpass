@@ -84,16 +84,6 @@ function deleteUser() {
 	return userRef.remove();
 }
 
-// function deleteUser(userID) {
-// 	if (!checkIfValidUserID(userID)) {
-// 		return Observable.throw(new Error('Invalid UserID'));
-// 	}
-
-// 	const userRef = getUserReference(userID);
-
-// 	return Observable.fromPromise(userRef.remove());
-// }
-
 /**
  * Password Functions
  */
@@ -192,16 +182,18 @@ function updatePassword(userID, updatedPassword) {
 	return Observable.fromPromise(passRef.set(encrypted));
 }
 
-function setMasterPassword(userID, password) {
+function setMasterPassword(password) {
+	const userID = getUserID();
+
 	if (!checkIfValidUserID(userID) || !password) {
-		return Observable.throw(new Error('Invalid UserID and/or Missing Password Info'));
+		return Observable.throw(new Error(`Invalid UserID and/or Missing Password`));
 	}
-	updateUserLastAccess(userID);
 
 	const hash = generatePasswordHash(password);
-	const masterPasswordReference = getMasterPasswordReference(userID);
+	const mPassRef = getMasterPasswordReference(userID);
 
-	return Observable.fromPromise(masterPasswordReference.set(hash));
+	return Observable.fromPromise(mPassRef.set(hash))
+		.debounceTime(1000);
 }
 
 function checkIfMasterPasswordIsCorrect(userID, password) {
