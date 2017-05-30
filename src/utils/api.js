@@ -196,16 +196,18 @@ function setMasterPassword(password) {
 		.debounceTime(1000);
 }
 
-function checkIfMasterPasswordIsCorrect(userID, password) {
-	if (!checkIfValidUserID(userID) || !password) {
-		return Observable.throw(new Error('Invalid UserID and/or Missing Password Info'));
+function checkIfValidMasterPassword(mPass) {
+	const userID = getUserID();
+
+	if (!checkIfValidUserID(userID) || !mPass) {
+		return Observable.throw(new Error(`Invalid UserID and/or Missing Password`));
 	}
 
 	const mPassRef = getMasterPasswordReference(userID);
 
 	return Observable.fromPromise(mPassRef.once('value'))
-						.map(extractData)
-						.map(hash => compareHashToPassword(password, hash))
+		.map(extractData)
+		.map(hash => compareHashToPassword(mPass, hash));
 }
 
 /**
@@ -233,6 +235,6 @@ export default {
 	updatePassword,
 	deletePassword,
 	setMasterPassword,
-	checkIfMasterPasswordIsCorrect,
+	checkIfValidMasterPassword,
 	logError,
 };

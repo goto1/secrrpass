@@ -1,11 +1,19 @@
 import { encrypt, decrypt } from './security';
 
-function init(userID, mPasswordSet = false) {
+function init(userID) {
 	if (!userID) { return; }
 
-	const info = { userID, mPasswordSet, sessionExpiration: null };
+	const info = { userID, mPasswordSet: false, sessionExpiration: null };
 
 	localStorage.setItem('info', encrypt(info));
+}
+
+function update(mPasswordSet) {
+	const userInfo = getUserInfo();
+
+	const updatedInfo = { ...userInfo, mPasswordSet };
+
+	localStorage.setItem('info', encrypt(updatedInfo));
 }
 
 function login() {
@@ -57,6 +65,7 @@ function isAccountProtected() {
 
 export default {
 	init,
+	update,
 	login,
 	logout,
 	getUserID,
