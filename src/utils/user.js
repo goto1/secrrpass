@@ -1,59 +1,65 @@
 import { encrypt, decrypt } from './security';
 
+function init(userID, mPasswordSet = false) {
+	if (!userID) { return; }
+
+	const info = { userID, mPasswordSet, sessionExpiration: null };
+
+	localStorage.setItem('info', encrypt(info));
+}
+
 function login() {
-	const expire = new Date();
-	expire.setMinutes(expire.getMinutes() + 20);
+	const userInfo = getUserInfo();
+	const expirationDate = new Date();
+	expirationDate.setMinutes(expirationDate.getMinutes() + 10);
 
-	const session = getSessionInfo();
-	const updated = encrypt({ ...session, expire });
+	const updatedInfo = {
+		...userInfo,
+		expirationDate: expirationDate.getTime(),
+	};
 
-	localStorage.setItem('user', updated);
+	localStorage.setItem('info', encrypt(updatedInfo));
 }
 
 export function logout() {
-	localStorage.removeItem('user');
+	localStorage.removeItem('info');
 }
 
-function getSessionInfo() {
-	const session = localStorage.getItem('user');
+function getUserInfo() {
+	const info = localStorage.getItem('info');
 
-	return session !== null ? decrypt(session) : null;
-}
-
-function setUserID(userID) {
-	if (!userID) { return; }
-
-	const session = getSessionInfo();
-	const updated = 
-		session !== null ? encrypt({ userID, ...session }) : encrypt({ userID });
-
-	localStorage.setItem('user', updated);
+	return info !== null ? decrypt(info) : null;
 }
 
 export function getUserID() {
-	const session = getSessionInfo();
+	const userInfo = getUserInfo();
 
-	return session !== null ? session.userID : null;
-}
-
-function getExpirationDate() {
-	const session = getSessionInfo();
-
-	return session !== null ? session.expire : null;
+	return userInfo !== null ? userInfo.userID : null;
 }
 
 function isSessionExpired() {
-	const expDate = getExpirationDate();
-	const currDate = new Date().toISOString();
+	const expirationDate = getUserInfo().expirationDate;
+	const currentDate = new Date().getTime();
+	let expired = true;
 
-	return expDate < currDate ? true : false;
+	if (expirationDate !== undefined) {
+		expired = expirationDate < currentDate ? true : false;
+	}
+
+	return expired;
+}
+
+function isAccountProtected() {
+	const userInfo = getUserInfo();
+
+	return userInfo.mPasswordSet;
 }
 
 export default {
+	init,
 	login,
 	logout,
 	getUserID,
-	getExpirationDate,
 	isSessionExpired,
-	setUserID,
+	isAccountProtected,
 };
