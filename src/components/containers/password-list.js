@@ -47,7 +47,6 @@ class PasswordList extends Component {
 		this.state = {
 			showLoader: true,
 			passwords: null,
-			isAccountPasswordProtected: false,
 			userID: props.match.params.userID,
 		};
 
@@ -61,21 +60,20 @@ class PasswordList extends Component {
 			this.state.userID : 
 			Generator.generateRandomID();
 
-		UserUtils.setUserID(userID);
+		API.checkIfUserExists(userID).then(
+			user => {
+				if (user === null) { API.createUser(); }
 
-		console.log(UserUtils.getUserID());
+				const mPassSet = user.masterPassword !== undefined ? true : false;
 
-		API.checkIfUserExists()
-			.then(user => {
-				if (user !== null && user.hasOwnProperty('firstAccess')) {
-					this.setState({ isAccountPasswordProtected: user.masterPassword ? true : false });
-				} else {
-					API.createUser();
+				if (UserUtils.getUserID() === null && UserUtils.getUserID() !== userID) {
+					UserUtils.init(userID, mPassSet);
 				}
-			})
-			.catch(err => ErrorHandler.log({ err, location: 'password-list.js:75' }));
+			}
+		)
+		.catch(err => ErrorHandler.log({ err, location: 'password-list.js:74' }));
 
-		API.getPasswords()
+		API.getPasswords(userID)
 			.then(passwords => this.setState({ passwords, showLoader: false }))
 			.catch(err => ErrorHandler.log({ err, location: 'password-list.js:79' }));
 	}
@@ -121,15 +119,12 @@ class PasswordList extends Component {
 		const expectedPath = `/${userID}`;
 		const passwordList = this.getListOfPasswords();
 		const styles = this.getStyles();
-		const { isAccountPasswordProtected } = this.state;
 
-		// Display a login form when needed
-		if (isAccountPasswordProtected && UserUtils.isSessionExpired()) {
-			return <Redirect to='/login' />
+		if (UserUtils.isAccountProtected() && UserUtils.isSessionExpired()) {
+			return <Redirect to='/login' />;
 		}
 
-		if (	API.checkIfValidUserID(userID) && 
-					(currPath !== expectedPath)) {
+		if (API.checkIfValidUserID(userID) && (currPath !== expectedPath)) {
 			return <Redirect to={expectedPath} />;
 		}
 
