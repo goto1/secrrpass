@@ -59,17 +59,6 @@ function createUser() {
 	return userRef.set(access);
 }
 
-function createNewUser(userID) {
-	if (!checkIfValidUserID(userID)) {
-		return Observable.throw(new Error('Invalid UserID'));
-	}
-
-	const userRef = getUserReference(userID);
-	const access = { firstAccess: Date.now(), lastAccess: Date.now() };
-
-	return Observable.fromPromise(userRef.set(access));
-}
-
 function deleteUser() {
 	const userID = getUserID();
 
