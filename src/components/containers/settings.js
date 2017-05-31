@@ -3,29 +3,8 @@ import { Redirect } from 'react-router';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import Card from '../layouts/card';
 import ButtonBuilder from '../views/buttons';
-import SuccessfulSubmission from '../views/successful-submission';
-import './settings.css';
-
 import { UserUtils, FormUtils, API, ErrorHandler } from '../../utils/utils';
-
-function genSuccSubmissionMessage({ message, push }) {
-	const userID = UserUtils.getUserID();
-	let action = null;
-	
-	if (userID) {
-		action = () => push(`/${userID}`);
-	} else {
-		action = () => push(`/`);
-	}
-
-	return (
-		<SuccessfulSubmission
-			message={message}
-			actionName='Home'
-			action={action} 
-		/>
-	);
-}
+import './settings.css';
 
 function generateFormFieldAttributes({ name, placeholder, onChange }) {
 	return {

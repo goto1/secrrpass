@@ -43,7 +43,6 @@ class Login extends Component {
 	handleSubmit(event) {
 		event.preventDefault();
 
-		const userID = UserUtils.getUserID();
 		const password = this.state.formFields.password.attr.value;
 
 		this.checkIfLoginSuccessful = API.checkIfValidMasterPassword(password)
