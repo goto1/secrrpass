@@ -86,6 +86,8 @@ class PasswordOptions extends Component {
 	constructor(props) {
 		super(props);
 
+		console.log(props);
+
 		this.state = {
 			buttons: {
 				delete: {
@@ -134,8 +136,8 @@ class PasswordOptions extends Component {
 	}
 
 	copy() {
-		const { id } = this.props;
-		console.log(`password with id of ${id} was copied...`);
+		const { password } = this.props;
+		window.prompt('Copy to clipboard: Ctrl+C, Enter', password);
 	}
 
 	edit() {

@@ -60,8 +60,14 @@ class PasswordItem extends Component {
 	}
 
 	render() {
-		const { serviceName, userName, id, deletePassword } = this.props;
-		const passOptions = <PasswordOptions key={id} id={id} deletePassword={deletePassword} />;
+		const { serviceName, userName, id, deletePassword, password } = this.props;
+		const passOptions = 
+			<PasswordOptions 
+				key={id} 
+				id={id} 
+				password={password}
+				deletePassword={deletePassword} 
+			/>;
 
 		return (
 			<div className="PasswordItem">
