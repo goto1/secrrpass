@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { decrypt } from './security';
 
 export function extractData(data) {
@@ -9,12 +10,10 @@ export function extractData(data) {
 export function decryptUserPasswords(data) {
 	if (!data) { return null; }
 
-	const passwords = Object.assign({}, data);
-	const decrypted = {};
-
-	Object.keys(passwords).map((id) => {
-		decrypted[id] = decrypt(passwords[id]);
-	});
+	const decrypted = _.reduce(data, (result, value, key) => {
+		result[key] = decrypt(value);
+		return result;
+	}, {});
 
 	return decrypted;
 }
