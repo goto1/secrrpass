@@ -117,8 +117,7 @@ class PasswordList extends Component {
 	render() {
 		const userID = UserUtils.getUserID();
 		const currPath = this.props.location.pathname;
-		const expectedPath = `/build/${userID}`;
-		console.log(expectedPath);
+		const expectedPath = `/${userID}`;
 		const passwordList = this.getListOfPasswords();
 		const styles = this.getStyles();
 
@@ -126,7 +125,7 @@ class PasswordList extends Component {
 			return <Redirect to='/login' />;
 		}
 
-		if (currPath !== expectedPath) {
+		if (API.isUserIDValid() && currPath !== expectedPath) {
 			return <Redirect to={expectedPath} />;
 		}
 

@@ -142,8 +142,6 @@ function getPassword(passID) {
 }
 
 function deletePassword(passID) {
-	console.log(passID);
-
 	if (!isUserIDValid() || !isPasswordIDValid(passID)) {
 		return Promise.reject(new Error('Invalid UserID and/or PasswordID'));
 	}
@@ -214,6 +212,7 @@ export default {
 	deleteUser,
 	updateUserLastAccess,
 	isPasswordIDValid,
+	isUserIDValid,
 	createNewPassword,
 	getPasswords,
 	getPassword,
