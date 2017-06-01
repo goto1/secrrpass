@@ -117,7 +117,7 @@ class PasswordList extends Component {
 	render() {
 		const userID = UserUtils.getUserID();
 		const currPath = this.props.location.pathname;
-		const expectedPath = `/${userID}`;
+		const expectedPath = `/build/${userID}`;
 		const passwordList = this.getListOfPasswords();
 		const styles = this.getStyles();
 
