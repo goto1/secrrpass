@@ -76,7 +76,6 @@ class EditPassword extends Component {
 	handleSubmit(event) {
 		event.preventDefault();
 
-		const userID = UserUtils.getUserID();
 		const passwordID = this.props.match.params.passwordID;
 		const { name, username, password } = this.state.formFields;
 		const updatedPass = {

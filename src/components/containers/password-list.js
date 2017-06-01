@@ -54,9 +54,11 @@ class PasswordList extends Component {
 	}
 
 	setup() {
-		const paramsUserID = this.props.match.params.userID;
-		const userID = 
-			API.checkIfValidUserID(paramsUserID) ? paramsUserID : Generator.generateRandomID();
+		let userID = this.props.match.params.userID;
+
+		if (userID === undefined) {
+			userID = Generator.generateRandomID();
+		}
 
 		if (UserUtils.getUserID() !== userID) { UserUtils.init(userID); }
 	}
@@ -76,13 +78,13 @@ class PasswordList extends Component {
 			.then(passwords => this.setState({ passwords, showLoader: false }))
 			.catch(err => ErrorHandler.log({ err, location: 'password-list.js:77' }));
 	}
-	
+
 	deletePassword(passID) {
 		API.deletePassword(passID)
 			.then(res => {
-				const passwords = _.filter(this.state.passwords,
-					(password, id) => id !== passID);
-				this.setState({ passwords });
+				this.setState({
+					passwords: _.filter(this.state.passwords, (pass, id) => id !== passID)
+				})
 			})
 			.catch(err => ErrorHandler.log({ err, location: 'password-list.js:91' }));
 	}
@@ -123,7 +125,7 @@ class PasswordList extends Component {
 			return <Redirect to='/login' />;
 		}
 
-		if (API.checkIfValidUserID(userID) && (currPath !== expectedPath)) {
+		if (currPath !== expectedPath) {
 			return <Redirect to={expectedPath} />;
 		}
 
