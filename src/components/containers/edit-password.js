@@ -3,7 +3,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import CardLayout from '../layouts/card';
 import { InputField } from '../views/input-field';
 import SuccessfulSubmission from '../views/successful-submission';
-import { forEach } from 'lodash';
+import * as _ from 'lodash';
 import PasswordGeneratorForm from './password-generator-form';
 import Loader from '../views/loader';
 import ButtonBuilder from '../views/buttons';
@@ -46,33 +46,30 @@ class EditPassword extends Component {
 	}
 
 	componentDidMount() {
-		const userID = UserUtils.getUserID();
-		const passwordID = this.props.match.params.passwordID;
+		const passID = this.props.match.params.passwordID;
 
-		this.getPassDetails = API.getPasswordDetails(userID, passwordID)
-			.subscribe(
-				response => {
-					const { serviceName, userName, password } = response;
+		if (API.isPasswordIDValid(passID) === false) { return; }
+
+		API.getPassword(passID)
+			.then(passInfo => {
+				if (passInfo !== null) {
+					const { serviceName, userName, password } = passInfo;
 					const formFields = { ...this.state.formFields };
 
 					formFields.name.attr.value = serviceName;
 					formFields.username.attr.value = userName;
 					formFields.password.attr.value = password;
 
-					forEach(formFields, (value, key) => formFields[key].valid = true);
+					_.forEach(formFields, (value, key) => formFields[key].valid = true);
 
-					this.setState({ formFields, loading: false, createdAt: response.createdAt });
-				},
-				err => ErrorHandler.log({
-					err: new Error(`Could't retrieve password details`),
-					location: 'edit-password.js:69'
-				})
-			);
+					this.setState({ formFields, loading: false, createdAt: passInfo.createdAt });
+				}
+			})
+			.catch(err => ErrorHandler.log({ err, location: 'edit-password.js:68' }));
 	}
 
 	componentWillUnmount() {
 		// cleanup
-		if (this.getPassDetails) { this.getPassDetails.unsubscribe(); }
 		if (this.updatePass) { this.updatePass.unsubscribe(); }
 	}
 
@@ -90,13 +87,10 @@ class EditPassword extends Component {
 			createdAt: this.state.createdAt,
 		};
 
-		this.updatePass = API.updatePassword(userID, updatedPass)
+		this.updatePass = API.updatePassword(updatedPass)
 			.subscribe(
 				res => this.setState({ formSubmitted: true }),
-				err => ErrorHandler.log({
-					err: new Error(`Couldn't update user password`),
-					location: 'edit-password.js:98'
-				})
+				err => ErrorHandler.log({ err, location: 'edit-password.js:93' })
 			);
 	}
 
