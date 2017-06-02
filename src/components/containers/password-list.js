@@ -124,6 +124,7 @@ class PasswordList extends Component {
 			return <Redirect to='/login' />;
 		}
 
+		console.log('this.props', this.props);
 		console.log('expectedPath', expectedPath);
 		console.log('userID', UserUtils.getUserID());
 		console.log('isUserIDValid', API.isUserIDValid());
