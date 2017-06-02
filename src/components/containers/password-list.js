@@ -115,15 +115,18 @@ class PasswordList extends Component {
 	}
 
 	render() {
-		const userID = UserUtils.getUserID();
 		const currPath = this.props.location.pathname;
-		const expectedPath = `/${userID}`;
+		const expectedPath = `/${UserUtils.getUserID()}`;
 		const passwordList = this.getListOfPasswords();
 		const styles = this.getStyles();
 
 		if (UserUtils.isAccountProtected() && UserUtils.isSessionExpired()) {
 			return <Redirect to='/login' />;
 		}
+
+		console.log('expectedPath', expectedPath);
+		console.log('userID', UserUtils.getUserID());
+		console.log('isUserIDValid', API.isUserIDValid());
 
 		if (API.isUserIDValid() && currPath !== expectedPath) {
 			return <Redirect to={expectedPath} />;

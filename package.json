@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "flow-bin": "^0.42.0",
+    "gh-pages": "^1.0.0",
     "react-scripts": "0.9.5"
   },
   "scripts": {
@@ -23,7 +24,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "flow": "flow"
+    "flow": "flow",
+    "deploy": "gh-pages -d build"
   },
   "homepage": "https://goto1.github.io/secrrpass/build/"
 }
