@@ -27,5 +27,5 @@
     "flow": "flow",
     "deploy": "gh-pages -d build"
   },
-  "homepage": "https://goto1.github.io/secrrpass/"
+  "homepage": "https://secrrpass.firebaseapp.com/"
 }
