@@ -9,9 +9,9 @@ There is no need to create a new user account. The first time user visits the ap
 This app was developed for learning purposes as I wanted to learn `React.js` and `Firebase`.
 
 ### Try It Out
-* [secrrpass.firebaseapp.com/e2p3p0](https://goto1.github.io/secrrpass/build/e2p3p0)
+* [secrrpass.firebaseapp.com/e2p3p0](https://secrrpass.firebaseapp.com/e2p3p0)
   * master password: ***password123***
-* [secrrpass.firebaseapp.com/o9f51k](https://goto1.github.io/secrrpass/build/o9f51k)
+* [secrrpass.firebaseapp.com/o9f51k](https://secrrpass.firebaseapp.com/o9f51k)
 	* no master password
-* [secrrpass.firebaseapp.com](https://goto1.github.io/secrrpass/build/)
+* [secrrpass.firebaseapp.com](https://secrrpass.firebaseapp.com/)
 	* creates a new user
